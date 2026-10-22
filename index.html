@@ -118,6 +118,13 @@ tr.dirty td{background:var(--warn-soft)}
 .savebar{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:20;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;
   background:var(--surface);border:1px solid var(--accent);border-radius:var(--r);padding:10px 14px;box-shadow:0 6px 24px rgba(0,0,0,.15)}
 .savebar b{font-weight:600}
+.strip{display:grid;grid-template-columns:repeat(4,minmax(0,130px));gap:10px}
+.strip .tile{display:flex;flex-direction:column;gap:4px;min-width:0}
+.strip .ph{aspect-ratio:1;border-radius:8px;border:1px solid var(--line);background:var(--sunken);display:flex;align-items:center;justify-content:center;font-size:11.5px;color:var(--muted);text-align:center;padding:4px;overflow:hidden}
+.strip img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;border:1px solid var(--line);cursor:zoom-in;display:block}
+.strip b{font-size:12.5px;font-weight:600}
+.strip small{font-size:11px;color:var(--muted)}
+.asv{font-size:12.5px;color:var(--muted)} .asv.ok{color:var(--good)} .asv.err{color:var(--bad)}
 .photo-btn{border:none;background:none;cursor:pointer;padding:0 2px;font-size:13px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;z-index:50;max-width:calc(100% - 32px);text-align:center}
 .photo-view{position:fixed;inset:0;background:rgba(0,0,0,.88);display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;z-index:60;padding:20px;color:#fff}
@@ -178,7 +185,7 @@ en:{
   thBranch:'Branch', thPrev:'Previous', thCur:'Latest', thDiff:'Diff (pts)', thTarget:'Target', thGapShelf:'Shelf short',
   branchesTitle:'Branches', statusNote:'Status follows each supervisor’s current reading',
   partialTag:'(partial)', edit:'Edit', del:'Delete', confirm:'Confirm', noReadings:'No readings for this branch yet.', enterCur:'Enter current reading ({n})', inactive:'Inactive',
-  photosTitle:'Shelf photos', noPhotos:'No shelf photos for this branch yet. Supervisors add them with the 📷 button while recording.', deleted:'Reading deleted',
+  photosTitle:'Shelf photos (latest per category)', noPhotos:'No shelf photos for this branch yet. Supervisors add them with the 📷 button while recording.', deleted:'Reading deleted',
   usersTitle:'People and PINs', thName:'Name', thRole:'Access level', thTitle:'Job title', thActive:'Active', thNewPin:'New PIN', keep:'unchanged',
   titlePh:'Shown instead of access level', newUserName:'New person’s name', pinHint:'PIN (4–8 digits)', add:'Add',
   pinNote:'PINs are stored encrypted and cannot be viewed later. Send the new PIN to the person yourself.',
@@ -193,6 +200,7 @@ en:{
   sumHead:['Supervisor','Governorate','Current reading','Total branches','Recorded','Remaining','Completion'],
   readingHdr:'Reading {n}', gapNote:'Short {p} pts ({s} of shelf) vs target {t}',
   photoCap:'{c} · reading {r}', viewPhoto:'View shelf photo',
+  asvIdle:'Changes save automatically', asvSaving:'Saving…', asvSaved:'Saved automatically ✓ {t}', asvLocal:'Saved on this phone. It uploads when the internet is back', asvErr:'Not saved: {e}', draftMark:' ✎ not saved yet', noPhoto:'No photo', photoOf:'Reading {r} · {d}', loadingPhotos:'Loading photos…',
   errs:{ bad_pin:'Wrong PIN', locked:'Too many wrong tries. Sign-in is paused for 15 minutes', locked_reading:'This reading is locked. Only your manager can edit it now',
     forbidden:'You do not have permission for this', actual_gt_total:'Actual shelf cannot be more than the total shelf', invalid:'Some data is missing or not valid',
     no_branch:'Branch not found', bad_new_pin:'The PIN must be 4 to 8 digits', network:'No internet connection', server:'Server error', photo:'Could not upload the photo', generic:'Something went wrong' },
@@ -237,7 +245,7 @@ ar:{
   thBranch:'الفرع', thPrev:'السابقة', thCur:'الأخيرة', thDiff:'الفرق (نقطة)', thTarget:'المستهدف', thGapShelf:'الناقص من الرف',
   branchesTitle:'الفروع', statusNote:'الحالة حسب القراءة الحالية لكل مسؤول',
   partialTag:'(ناقص)', edit:'تعديل', del:'حذف', confirm:'تأكيد', noReadings:'لا توجد قراءات لهذا الفرع بعد.', enterCur:'إدخال القراءة الحالية ({n})', inactive:'موقوف',
-  photosTitle:'صور الرفوف', noPhotos:'لا توجد صور لهذا الفرع بعد. المسؤول بيضيفها بزرار 📷 وهو بيسجل.', deleted:'تم حذف القراءة',
+  photosTitle:'صور الرفوف (آخر صورة لكل فئة)', noPhotos:'لا توجد صور لهذا الفرع بعد. المسؤول بيضيفها بزرار 📷 وهو بيسجل.', deleted:'تم حذف القراءة',
   usersTitle:'المسؤولين والرموز السرية', thName:'الاسم', thRole:'الصلاحية', thTitle:'المسمى الوظيفي', thActive:'نشط', thNewPin:'رمز جديد', keep:'بدون تغيير',
   titlePh:'يظهر بدل اسم الصلاحية', newUserName:'اسم مسؤول جديد', pinHint:'رمز (4-8 أرقام)', add:'إضافة',
   pinNote:'الرمز بيتحفظ مشفر ومحدش يقدر يشوفه بعد الحفظ. ابعته للمسؤول بنفسك.',
@@ -252,6 +260,7 @@ ar:{
   sumHead:['المسؤول','المحافظة','القراءة الحالية','إجمالي الفروع','اتسجلت','المتبقي','نسبة الإنجاز'],
   readingHdr:'القراءة {n}', gapNote:'ناقص {p} نقطة ({s} من الرف) عن المستهدف {t}',
   photoCap:'{c} · القراءة {r}', viewPhoto:'عرض صورة الرف',
+  asvIdle:'التعديلات بتتحفظ تلقائيًا', asvSaving:'جاري الحفظ…', asvSaved:'اتحفظ تلقائيًا ✓ {t}', asvLocal:'اتحفظ على الموبايل، وهيترفع لما النت يرجع', asvErr:'لم يتم الحفظ: {e}', draftMark:' ✎ لم يُحفظ بعد', noPhoto:'لا توجد صورة', photoOf:'القراءة {r} · {d}', loadingPhotos:'جاري تحميل الصور…',
   errs:{ bad_pin:'الرمز السري غير صحيح', locked:'تم إيقاف الدخول 15 دقيقة بسبب محاولات خاطئة كثيرة', locked_reading:'القراءة دي اتقفلت. التعديل بقى متاح لمديرك فقط',
     forbidden:'مش مسموح لك بالعملية دي', actual_gt_total:'المساحة الفعلية لا يمكن أن تكون أكبر من الكلية', invalid:'البيانات غير مكتملة أو غير صحيحة',
     no_branch:'الفرع غير موجود', bad_new_pin:'الرمز لازم يكون من 4 لـ 8 أرقام', network:'مفيش اتصال بالإنترنت', server:'خطأ في الخادم', photo:'تعذر رفع الصورة', generic:'حصل خطأ' },
@@ -364,6 +373,9 @@ class RemoteBackend {
   saveBranch(u,p,b){ return this.rpc('admin_save_branch',{p_user:u,p_pin:p,p_id:b.id ?? null,p_gov:b.gov,p_name:b.name,p_sup:b.sup_id,p_active:b.active}); }
   saveUser(u,p,x){ return this.rpc('admin_save_user',{p_user:u,p_pin:p,p_id:x.id,p_name:x.name,p_role:x.role,p_gov:x.gov || null,p_active:x.active,p_new_pin:x.pin || null,p_title:x.title || null}); }
   saveTargets(u,p,tg){ return this.rpc('admin_save_targets',{p_user:u,p_pin:p,p_targets:tg}); }
+  savePhoto(u,p,branch,cat,data,round){ return this.rpc('save_photo',{p_user:u,p_pin:p,p_branch:branch,p_cat:cat,p_data:data,p_round:round}); }
+  getPhotos(u,p,branch){ return this.rpc('get_photos',{p_user:u,p_pin:p,p_branch:branch}); }
+  photoIndex(u,p){ return this.rpc('photo_index',{p_user:u,p_pin:p}); }
   async uploadPhoto(dataUrl, path){
     const blob = await (await fetch(dataUrl)).blob();
     let res;
@@ -452,6 +464,26 @@ class LocalBackend {
     this.persist(); return {ok:true};
   }
   async saveTargets(id,pin,tg){ const u = this.auth(id,pin); if(u.role !== 'admin') throw mkErr('forbidden'); this.db.targets = clone(tg); this.persist(); return {ok:true, targets:tg}; }
+  canBranch(u, b, write){ return u.role === 'admin' || u.role === 'analyst' || (u.role === 'gov' ? b.gov === u.gov : b.sup_id === u.id && (b.active || !write)); }
+  async savePhoto(id,pin,branch,cat,data,round){
+    const u = this.auth(id,pin), b = this.db.branches.find(x => x.id === branch);
+    if(!b) throw mkErr('no_branch'); if(!this.canBranch(u,b,true)) throw mkErr('forbidden');
+    this.db.photos = this.db.photos || {}; const now = new Date().toISOString();
+    this.db.photos[branch+':'+cat] = {data, round, updated_at:now}; this.persist();
+    return {ok:true, ref:'db:'+Date.parse(now)};
+  }
+  async getPhotos(id,pin,branch){
+    const u = this.auth(id,pin), b = this.db.branches.find(x => x.id === branch);
+    if(!b) throw mkErr('no_branch'); if(!this.canBranch(u,b,false)) throw mkErr('forbidden');
+    const out = {}; Object.entries(this.db.photos || {}).forEach(([k,v]) => { const [bid,cat] = k.split(':'); if(+bid === branch) out[cat] = v; });
+    return clone(out);
+  }
+  async photoIndex(id,pin){
+    const u = this.auth(id,pin), out = {};
+    Object.entries(this.db.photos || {}).forEach(([k,v]) => { const [bid,cat] = k.split(':'); const b = this.db.branches.find(x => x.id === +bid);
+      if(b && this.canBranch(u,b,false)) (out[bid] = out[bid] || {})[cat] = {round:v.round, updated_at:v.updated_at}; });
+    return out;
+  }
   async uploadPhoto(dataUrl){ return dataUrl; }
   photoUrl(ref){ return ref; }
 }
@@ -463,11 +495,16 @@ const S = {
   sess: store.get('sess'), user: null, data: null, users: store.get('users-cache') || [],
   login: {gov:'', uid:'', pin:'', err:''},
   filter: 'all', sel: null, editRound: null, draft: null,
-  tab: 'dash', f: {gov:'all', sup:'all'}, aq: '', edits: {},
+  tab: 'dash', f: {gov:'all', sup:'all'}, aq: '', edits: {}, photos: {}, photoIdx: {}, asv: {state:'idle'}, saving: false,
   armed: null, online: navigator.onLine, busy: false, waLink: null
 };
 const qKey = () => 'queue:' + S.user.id;
-const dKey = () => 'draft:' + S.user.id;
+const dKey = () => 'drafts:' + S.user.id;
+const oKey = () => 'open:' + S.user.id;
+const draftId = (b, r) => b + ':' + r;
+const allDrafts = () => (S.user && store.get(dKey())) || {};
+function dropDraft(b, r){ const all = allDrafts(); delete all[draftId(b, r)]; store.set(dKey(), all); }
+function hasDraft(b){ return Object.entries(allDrafts()).some(([k, d]) => k.split(':')[0] === String(b) && S.data && draftDirty(d)); }
 const isMgr = () => S.user && S.user.role !== 'sup';
 const canEdit = () => S.user && ['gov','analyst','admin'].includes(S.user.role);
 const isAdmin = () => S.user && S.user.role === 'admin';
@@ -518,20 +555,21 @@ function mergeServerReading(rd){
 }
 function cacheData(){ if(S.user) store.set('data:' + S.user.id, S.data); }
 async function pushOne(item){
-  const cats = clone(item.cats);
+  const cats = clone(item.cats), refs = {};
   for(const k of CAT_KEYS){
     const v = cats[k];
     if(v && v.photoData){
-      const path = `${new Date().toISOString().slice(0,7)}/${item.branch}-r${item.round}-${k}-${Date.now()}.jpg`;
-      v.photo = await API.uploadPhoto(v.photoData, path);
-      delete v.photoData;
+      const r = await API.savePhoto(S.sess.id, S.sess.pin, item.branch, k, v.photoData, item.round);
+      (S.photos[item.branch] = S.photos[item.branch] || {})[k] = {data:v.photoData, round:item.round, updated_at:new Date().toISOString()};
+      (S.photoIdx[item.branch] = S.photoIdx[item.branch] || {})[k] = {round:item.round};
+      v.photo = refs[k] = r.ref; delete v.photoData;
     }
   }
   const res = await API.saveReading(S.sess.id, S.sess.pin, item.branch, cats, item.round);
   mergeServerReading(res.reading);
   if(res.round != null) S.data.round = res.round;
   cacheData();
-  return res;
+  return {res, refs};
 }
 async function syncQueue(){
   if(!S.user) return;
@@ -541,28 +579,131 @@ async function syncQueue(){
     catch(e){ if(e.code === 'network') break; toast(t('uploadFail') + e.message, 5000); q.shift(); setQueue(q); }
   }
   if(!queue().length) toast(t('uploadedAll'));
-  render();
+  safeRender();
 }
+// re-render unless someone is typing in a category box (a re-render would drop their keyboard)
+function safeRender(){ const a = document.activeElement; if(a && a.closest && a.closest('.stage')) paintAsv(); else render(); }
 
 /* ---------- Draft ---------- */
 function openBranch(bid, round){
+  if(S.draft && (S.draft.branch !== bid || S.draft.round !== (round ?? S.draft.round))) flushAutosave();
   const b = branchById(bid);
   const R = round ?? roundFor(b.sup_id);
-  S.sel = bid; S.editRound = R; S.armed = null; S.waLink = null;
-  const d = store.get(dKey());
-  if(d && d.branch === bid && d.round === R) S.draft = d;
+  S.sel = bid; S.editRound = R; S.armed = null; S.waLink = null; S.asv = {state:'idle'};
+  const d = allDrafts()[draftId(bid, R)];
+  if(d) S.draft = d;
   else { const rd = readingAt(bid, R); S.draft = {branch:bid, round:R, cats: rd ? clone(rd.cats) : {}, open:null}; }
-  saveDraft(); render(); scrollTo('editor');
+  if(isMgr()) S.draft.editing = S.draft.editing || false;
+  store.set(oKey(), {b:bid, r:R});
+  render(); scrollTo('editor'); loadPhotos(bid);
 }
 function scrollTo(id){ setTimeout(() => { const el = document.getElementById(id); if(el) el.scrollIntoView({behavior:'smooth', block:'start'}); }, 40); }
-function saveDraft(){ if(S.draft) store.set(dKey(), S.draft); }
-function closeBranch(){ S.sel = null; S.draft = null; S.editRound = null; S.waLink = null; store.del(dKey()); render(); }
-function draftDirty(){
-  if(!S.draft) return false;
-  const rd = readingAt(S.draft.branch, S.draft.round);
-  return JSON.stringify(S.draft.cats) !== JSON.stringify(rd ? rd.cats : {});
+function saveDraft(d){
+  d = d || S.draft;
+  if(!d || !S.user) return;
+  const all = allDrafts();
+  if(draftDirty(d) || d.open) all[draftId(d.branch, d.round)] = d;
+  else delete all[draftId(d.branch, d.round)];
+  store.set(dKey(), all);
+}
+function closeBranch(){
+  flushAutosave();
+  S.sel = null; S.draft = null; S.editRound = null; S.waLink = null; store.del(oKey()); render();
+}
+function draftDirty(d){
+  d = d || S.draft; if(!d) return false;
+  const rd = readingAt(d.branch, d.round);
+  return JSON.stringify(d.cats) !== JSON.stringify(rd ? rd.cats : {});
 }
 
+/* ---------- Auto-save: nothing typed is lost even if Save is never tapped ---------- */
+let asvTimer = null;
+function scheduleAutosave(ms = 2500){ clearTimeout(asvTimer); asvTimer = setTimeout(() => autoSave(), ms); }
+function flushAutosave(){ clearTimeout(asvTimer); if(S.draft && draftDirty()) autoSave(); }
+async function autoSave(){
+  if(!S.draft || !draftDirty()) return;
+  const b = branchById(S.draft.branch); if(!b || !editable(b, S.draft.round)) return;
+  try{ checkCats(S.draft.cats); }catch(e){ return; }
+  if(S.saving){ scheduleAutosave(1500); return; }
+  await saveCore(true);
+  const a = document.activeElement;
+  if(a && a.closest && a.closest('.stage')) paintAsv(); else render();
+}
+function paintAsv(){ const el = document.getElementById('asv'); if(el) el.outerHTML = asvHtml(); }
+function asvHtml(){
+  const a = S.asv || {state:'idle'};
+  const txt = a.state === 'saving' ? t('asvSaving') : a.state === 'saved' ? t('asvSaved',{t:a.time}) : a.state === 'local' ? t('asvLocal') : a.state === 'error' ? t('asvErr',{e:esc(a.msg)}) : t('asvIdle');
+  return `<div class="asv ${a.state==='saved'?'ok':a.state==='error'?'err':''}" id="asv">${txt}</div>`;
+}
+// saves the open draft (photos first, then the reading); offline goes to the queue
+async function saveCore(silent){
+  const d = S.draft;
+  if(!d || !Object.keys(d.cats).length) return false;
+  const item = {branch:d.branch, round:d.round, cats:clone(d.cats)};
+  S.saving = true; S.asv = {state:'saving'}; paintAsv();
+  const applyRefs = refs => { for(const [k, ref] of Object.entries(refs)){
+      const c = d.cats[k]; if(c && c.photoData === item.cats[k].photoData){ c.photo = ref; delete c.photoData; }
+      if(d.open && d.open.k === k && d.open.photoData === item.cats[k].photoData){ d.open.photo = ref; delete d.open.photoData; } } };
+  try{
+    const {refs} = await pushOne(item);
+    applyRefs(refs);
+    saveDraft(d);
+    S.asv = {state:'saved', time:new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',timeZone:'Africa/Cairo'})};
+    return true;
+  }catch(e){
+    if(e.code === 'network'){
+      const q = queue().filter(x => !(x.branch === item.branch && x.round === item.round)); q.push(item); setQueue(q);
+      applyLocal(item.branch, item.round, item.cats, {pending:true});
+      saveDraft(d); S.asv = {state:'local'};
+      return true;
+    }
+    S.asv = {state:'error', msg:e.message}; if(!silent) toast(e.message, 4000);
+    return false;
+  }finally{ S.saving = false; paintAsv(); }
+}
+// copy the open category's numbers into the draft as soon as they are valid
+function commitOpen(){
+  const o = S.draft && S.draft.open; if(!o) return;
+  const keep = {}; if(o.photo) keep.photo = o.photo; if(o.photoData) keep.photoData = o.photoData;
+  if(o.na){ S.draft.cats[o.k] = {na:true, ...keep}; return; }
+  const tt = num(o.t), a = num(o.a);
+  if(tt != null && a != null && tt > 0 && a >= 0 && a <= tt) S.draft.cats[o.k] = {t:tt, a, ...keep};
+  else if(S.draft.cats[o.k] && !S.draft.cats[o.k].na) Object.assign(S.draft.cats[o.k], keep);
+}
+// upload drafts left on this phone for other branches (e.g. the app was closed before saving)
+async function syncDrafts(){
+  const all = allDrafts();
+  for(const [id, d] of Object.entries(all)){
+    if(S.draft && draftId(S.draft.branch, S.draft.round) === id) continue;
+    const b = branchById(d.branch);
+    if(!b || !draftDirty(d)){ if(!d.open || !b) dropDraft(d.branch, d.round); continue; }
+    if(!editable(b, d.round)) continue;
+    try{ checkCats(d.cats); }catch(e){ continue; }
+    try{ await pushOne({branch:d.branch, round:d.round, cats:clone(d.cats)}); dropDraft(d.branch, d.round); }
+    catch(e){ if(e.code === 'network') break; }
+  }
+}
+async function loadPhotos(bid, force){
+  if(!force && S.photos[bid]) return;
+  try{ S.photos[bid] = await API.getPhotos(S.sess.id, S.sess.pin, bid) || {}; }
+  catch(e){ S.photos[bid] = S.photos[bid] || {}; return; }
+  const a = document.activeElement;
+  if(S.sel === bid && !(a && a.closest && a.closest('.stage'))) render();
+}
+function photoSrc(bid, k, c){
+  if(c && c.photoData) return c.photoData;
+  if(c && c.photo && !String(c.photo).startsWith('db:')) return API.photoUrl(c.photo);
+  const p = S.photos[bid] && S.photos[bid][k];
+  return p ? p.data : null;
+}
+function photoStrip(bid){
+  const ph = S.photos[bid];
+  if(!ph) return `<div class="muted">${t('loadingPhotos')}</div>`;
+  if(!Object.keys(ph).length) return `<div class="muted">${t('noPhotos')}</div>`;
+  return `<div class="strip">${CAT_KEYS.map(k => { const p = ph[k], cap = catName(k);
+    return `<div class="tile"><b>${cap}</b>${p ? `<img src="${esc(p.data)}" alt="${esc(cap)}" data-act="viewphoto" data-src="${esc(p.data)}" data-cap="${esc(cap + ' · ' + t('photoOf',{r:p.round ?? '—', d:fmtDate(p.updated_at)}))}">
+      <small>${t('photoOf',{r:p.round ?? '—', d:fmtDate(p.updated_at)})}</small>` : `<div class="ph">${t('noPhoto')}</div>`}</div>`; }).join('')}</div>`;
+}
 /* ===================== Sign in ===================== */
 async function boot(){
   applyLang();
@@ -575,7 +716,7 @@ async function boot(){
       if(!S.data){ S.login.err = e.message; renderLogin(); return; }
       toast(t('offlineCache'));
     }
-    syncQueue(); return;
+    syncQueue().then(syncDrafts).then(safeRender).catch(() => {}); return;
   }
   renderLogin();
   try{ S.users = await API.listUsers(); store.set('users-cache', S.users); renderLogin(); }
@@ -587,16 +728,21 @@ async function loadData(){
   S.data = d; S.user = d.user; if(!S.data.targets) S.data.targets = {};
   pend.forEach(p => { S.data.readings = S.data.readings.filter(x => !(x.branch_id === p.branch_id && x.round === p.round)); S.data.readings.push(p); });
   cacheData(); restoreDraft(); render();
+  API.photoIndex(S.sess.id, S.sess.pin).then(x => { S.photoIdx = x || {}; }).catch(() => {});
 }
 function restoreDraft(){
   if(S.sel || !S.user) return;
-  const d = store.get(dKey());
-  if(!d || !branchById(d.branch)) return;
-  const b = branchById(d.branch);
-  if(S.user.role === 'sup' && d.round !== roundFor(b.sup_id) && !editable(b, d.round)){ store.del(dKey()); return; }
-  S.draft = d; S.sel = d.branch; S.editRound = d.round;
+  const o = store.get(oKey()); if(!o) return;
+  const b = branchById(o.b); if(!b) { store.del(oKey()); return; }
+  if(S.user.role === 'sup' && o.r !== roundFor(b.sup_id) && !editable(b, o.r)){ dropDraft(o.b, o.r); store.del(oKey()); return; }
+  const d = allDrafts()[draftId(o.b, o.r)];
+  const rd = readingAt(o.b, o.r);
+  S.draft = d || {branch:o.b, round:o.r, cats: rd ? clone(rd.cats) : {}, open:null};
+  S.sel = o.b; S.editRound = o.r;
+  setTimeout(() => { loadPhotos(o.b); if(draftDirty()) scheduleAutosave(1500); }, 0);
 }
 function logout(){
+  saveDraft();
   if(S.user) store.del('data:' + S.user.id);
   store.del('sess'); S.sess = null; S.user = null; S.data = null; S.sel = null; S.draft = null; S.edits = {};
   S.login = {gov:'', uid:'', pin:'', err:''};
@@ -607,7 +753,7 @@ async function doLogin(){
   if(!uid){ S.login.err = t('needName'); return renderLogin(); }
   if(!pin){ S.login.err = t('needPin'); return renderLogin(); }
   S.busy = true; renderLogin();
-  try{ await API.login(uid, pin); S.sess = {id:uid, pin}; store.set('sess', S.sess); await loadData(); syncQueue(); }
+  try{ await API.login(uid, pin); S.sess = {id:uid, pin}; store.set('sess', S.sess); await loadData(); syncQueue().then(syncDrafts).then(safeRender).catch(() => {}); }
   catch(e){ S.login.err = e.message; S.busy = false; renderLogin(); }
   S.busy = false;
 }
@@ -674,7 +820,7 @@ function branchSelect(st){
   const left = st.filter(x => x.s !== 'done'), done = st.filter(x => x.s === 'done');
   const mark = {none:'', partial:' · ' + t('st_partial'), pend:' · ' + t('st_pend'), done:' ✓'};
   const extra = b => isMgr() && S.f.sup === 'all' ? ' — ' + userName(b.sup_id) : '';
-  const opt = ({b,s}) => `<option value="${b.id}" ${S.sel===b.id?'selected':''}>${esc(b.name)}${esc(extra(b))}${mark[s]}</option>`;
+  const opt = ({b,s}) => `<option value="${b.id}" ${S.sel===b.id?'selected':''}>${esc(b.name)}${esc(extra(b))}${mark[s]}${hasDraft(b.id) ? t('draftMark') : ''}${S.photoIdx[b.id] ? ' 📷' : ''}</option>`;
   const groups = [];
   if(f !== 'done') groups.push(`<optgroup label="${t('grpLeft',{n:left.length})}">${left.map(opt).join('')}</optgroup>`);
   if(f !== 'left') groups.push(`<optgroup label="${t('grpDone',{n:done.length})}">${done.map(opt).join('')}</optgroup>`);
@@ -711,7 +857,7 @@ function renderEditor(){
   if(!can && !rd) return `<div class="card" id="editor">${head}<div class="banner info">${t('locked')}</div><button class="btn" data-act="close">${t('back')}</button></div>`;
   if(!can) return `<div class="card" id="editor">${head}
       <div class="banner info">${t('lockedNote',{d:fmtDate(rd.created_at)})}</div>
-      ${summaryTable(rd.cats)}
+      ${summaryTable(rd.cats, b.id, R)}
       <div class="grid2"><button class="btn wa" data-act="share">${t('share')}</button><button class="btn" data-act="close">${t('back')}</button></div>${wa}</div>`;
   const o = d.open, n = Object.keys(cats).length;
   return `<div class="card" id="editor">${head}
@@ -726,7 +872,8 @@ function renderEditor(){
         return `<button class="cat ${cls} ${o&&o.k===k?'open':''}" data-act="cat" data-k="${k}"><b>${catName(k)}${c && (c.photo||c.photoData) ? ' 📷' : ''}</b><span class="st">${stt}</span></button>`; }).join('')}
     </div></div>
     ${o ? stageHtml(o) : ''}
-    ${n ? summaryTable(cats) : `<div class="muted">${t('needAll')}</div>`}
+    ${n ? summaryTable(cats, b.id, R) : `<div class="muted">${t('needAll')}</div>`}
+    ${asvHtml()}
     <div class="grid2">
       <button class="btn primary" data-act="save" ${n?'':'disabled'}>${t('save')}</button>
       <button class="btn wa" data-act="share" ${n?'':'disabled'}>${t('saveShare')}</button>
@@ -753,7 +900,7 @@ function gapText(g){
 function stageHtml(o){
   const {msg, p, g} = stageEval(o);
   const ok = o.na || (p != null);
-  const photo = o.photoData || (o.photo ? API.photoUrl(o.photo) : null);
+  const photo = photoSrc(S.draft.branch, o.k, o);
   return `<div class="stage">
     <div class="row between"><b>${catName(o.k)}</b><button class="btn sm ghost" data-act="catclose">${t('close')}</button></div>
     <label class="check"><input type="checkbox" id="stNa" data-in="stNa" ${o.na?'checked':''}> ${t('naCheck')}</label>
@@ -773,11 +920,15 @@ function stageHtml(o){
     <button class="btn primary" data-act="catsave" id="stSave" ${ok?'':'disabled'}>${t('record')}</button>
   </div>`;
 }
-function photoBtn(c, cap){
-  const ref = c && (c.photoData || c.photo); if(!ref) return '';
-  return `<button class="photo-btn" data-act="viewphoto" data-src="${esc(c.photoData || API.photoUrl(c.photo))}" data-cap="${esc(cap)}" title="${t('viewPhoto')}" aria-label="${t('viewPhoto')}">📷</button>`;
+function photoBtn(c, cap, bid, k, round){
+  if(!c || !(c.photo || c.photoData)) return '';
+  const cur = S.photos[bid] && S.photos[bid][k];
+  let src = c.photoData || (c.photo && !String(c.photo).startsWith('db:') ? API.photoUrl(c.photo) : null);
+  if(!src && cur && (round == null || cur.round === round)) src = cur.data;
+  if(!src) return '';
+  return `<button class="photo-btn" data-act="viewphoto" data-src="${esc(src)}" data-cap="${esc(cap)}" title="${t('viewPhoto')}" aria-label="${t('viewPhoto')}">📷</button>`;
 }
-function summaryTable(cats){
+function summaryTable(cats, bid, round){
   let tt = 0, ta = 0;
   const tg = totalGap(cats);
   return `<div class="tw"><table>
@@ -787,7 +938,7 @@ function summaryTable(cats){
       if(c.na) return `<tr><td class="l">${catName(k)}</td><td colspan="3" class="nacell">${t('na')}</td></tr>`;
       tt += +c.t; ta += +c.a;
       const g = catGap(k, c), cls = g ? (g.below ? 'down' : 'up') : '';
-      return `<tr><td class="l">${catName(k)} ${photoBtn(c, catName(k))}</td><td>${fmtN(c.t)}</td><td>${fmtN(c.a)}</td>
+      return `<tr><td class="l">${catName(k)} ${photoBtn(c, catName(k), bid, k, round)}</td><td>${fmtN(c.t)}</td><td>${fmtN(c.a)}</td>
         <td class="${cls}">${fmtP(catPct(c))}${g && g.below ? `<small>−${g.pts.toFixed(2)} · ${fmtN(g.shelf)}</small>` : ''}</td></tr>`; }).join('')}
     <tr class="tot"><td class="l">${t('overall')}</td><td>${fmtN(tt)}</td><td>${fmtN(ta)}</td>
       <td class="${tg ? (tg.below ? 'down' : 'up') : ''}">${fmtP(totalPct(cats))}${tg && tg.below ? `<small>−${tg.pts.toFixed(2)} · ${fmtN(tg.shelf)}</small>` : ''}</td></tr>
@@ -812,34 +963,27 @@ async function compress(file){
   const url = URL.createObjectURL(file);
   try{
     const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
-    const max = 1000, s = Math.min(1, max / Math.max(img.width, img.height));
+    const max = 900, s = Math.min(1, max / Math.max(img.width, img.height));
     const c = document.createElement('canvas'); c.width = Math.round(img.width*s); c.height = Math.round(img.height*s);
     c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-    return c.toDataURL('image/jpeg', 0.6);
+    return c.toDataURL('image/jpeg', 0.55);
   } finally { URL.revokeObjectURL(url); }
 }
 async function saveBranch(){
-  readStage();
+  readStage(); commitOpen();
   const d = S.draft;
   if(!Object.keys(d.cats).length){ toast(t('needOne')); return false; }
   try{ checkCats(d.cats); }catch(e){ toast(e.message); return false; }
-  const item = {branch:d.branch, round:d.round, cats:clone(d.cats)};
+  clearTimeout(asvTimer);
   S.busy = true;
-  try{
-    await pushOne(item);
-    store.del(dKey());
-    S.draft = {branch:d.branch, round:d.round, cats:clone(readingAt(d.branch, d.round).cats), open:null, editing:d.editing};
-    toast(readingAt(d.branch, d.round).complete ? t('savedComplete') : t('savedPartial'));
-  }catch(e){
-    if(e.code === 'network'){
-      const q = queue().filter(x => !(x.branch === item.branch && x.round === item.round)); q.push(item); setQueue(q);
-      applyLocal(item.branch, item.round, item.cats, {pending:true});
-      store.del(dKey());
-      S.draft = {branch:d.branch, round:d.round, cats:clone(item.cats), open:null, editing:d.editing};
-      toast(t('savedLocal'), 3500);
-    } else { toast(e.message, 4000); S.busy = false; render(); return false; }
+  const ok = await saveCore(false);
+  S.busy = false;
+  if(ok){
+    d.open = null; saveDraft();
+    const rd = readingAt(d.branch, d.round);
+    toast(S.asv.state === 'local' ? t('savedLocal') : rd && rd.complete ? t('savedComplete') : t('savedPartial'));
   }
-  S.busy = false; render(); return true;
+  render(); return ok;
 }
 function shareText(bid, round, cats){
   const b = branchById(bid), rd = readingAt(bid, round);
@@ -967,16 +1111,14 @@ function renderMgrBranches(){
 function renderHistory(){
   const b = branchById(S.sel); if(!b) return '';
   const rs = readingsOf(b.id), R = roundFor(b.sup_id);
-  const cell = (k, c, p) => {
+  const cell = (k, c, p, rnd) => {
     if(!c) return `<td>—</td>`;
     if(c.na) return `<td class="nacell">${t('naShort')}</td>`;
     const v = catPct(c), pv = p && !p.na ? catPct(p) : null, tg = targets()[k] ?? null;
     const trend = pv == null ? '' : `<span class="trend">${v >= pv ? '▲' : '▼'}</span>`;
     const g = catGap(k, c);
-    return `<td class="${shareClass(v, tg, pv)}">${fmtP(v)}${trend} ${photoBtn(c, catName(k))}${g && g.below ? `<small>−${g.pts.toFixed(2)} · ${fmtN(g.shelf)}</small>` : ''}</td>`;
+    return `<td class="${shareClass(v, tg, pv)}">${fmtP(v)}${trend} ${photoBtn(c, catName(k), b.id, k, rnd)}${g && g.below ? `<small>−${g.pts.toFixed(2)} · ${fmtN(g.shelf)}</small>` : ''}</td>`;
   };
-  const photos = [];
-  rs.slice().reverse().forEach(r => CAT_KEYS.forEach(k => { const c = r.cats[k]; if(c && c.photo) photos.push({src:API.photoUrl(c.photo), cap:t('photoCap',{c:catName(k), r:r.round}), d:fmtDate(r.updated_at)}); }));
   return `<div class="card" id="history">
     <div class="row between">
       <div><h2>${esc(b.name)}</h2><div class="muted">${govName(b.gov)} · ${esc(userName(b.sup_id))}${b.active ? '' : ' · ' + t('inactive')}</div></div>
@@ -987,14 +1129,13 @@ function renderHistory(){
       <tbody>${rs.map((r,i) => { const p = i ? rs[i-1] : null;
         const tv = totalPct(r.cats), tp = p ? totalPct(p.cats) : null, tg = totalGap(r.cats);
         return `<tr><td>${r.round}${r.complete ? '' : ` <span class="muted">${t('partialTag')}</span>`}</td><td>${fmtDate(r.created_at)}</td>
-          ${CAT_KEYS.map(k => cell(k, r.cats[k], p && p.cats[k])).join('')}
+          ${CAT_KEYS.map(k => cell(k, r.cats[k], p && p.cats[k], r.round)).join('')}
           <td class="${shareClass(tv, tg ? tg.target : null, tp)}">${fmtP(tv)}${tg && tg.below ? `<small>−${tg.pts.toFixed(2)} · ${fmtN(tg.shelf)}</small>` : ''}</td>
           ${canEdit() ? `<td><button class="btn sm" data-act="mgredit" data-r="${r.round}">${t('edit')}</button>${isAdmin() ? ` <button class="btn sm danger ${S.armed==='del'+r.id?'armed':''}" data-act="delread" data-id="${r.id}">${S.armed==='del'+r.id?t('confirm'):t('del')}</button>` : ''}</td>` : ''}</tr>`; }).join('')}
       </tbody></table></div>` : `<div class="muted">${t('noReadings')}</div>`}
     ${canEdit() && !readingAt(b.id, R) && b.active ? `<button class="btn" data-act="mgredit" data-r="${R}">${t('enterCur',{n:R})}</button>` : ''}
     <h2>${t('photosTitle')}</h2>
-    ${photos.length ? `<div class="gallery">${photos.map(ph => `<figure><img src="${esc(ph.src)}" alt="${esc(ph.cap)}" loading="lazy" data-act="viewphoto" data-src="${esc(ph.src)}" data-cap="${esc(ph.cap + ' · ' + ph.d)}"><figcaption>${esc(ph.cap)} · ${ph.d}</figcaption></figure>`).join('')}</div>`
-      : `<div class="muted">${t('noPhotos')}</div>`}
+    ${photoStrip(b.id)}
   </div>`;
 }
 
@@ -1225,17 +1366,17 @@ document.addEventListener('click', async ev => {
     case 'refresh': try{ await loadData(); await syncQueue(); toast(t('refreshed')); }catch(e){ toast(e.message); } return;
     case 'sync': return syncQueue();
     case 'filter': S.filter = el.dataset.v; return render();
-    case 'goto': S.tab = 'branches'; S.sel = +el.dataset.id; S.draft = null; render(); scrollTo('history'); return;
+    case 'goto': S.tab = 'branches'; S.sel = +el.dataset.id; S.draft = null; render(); scrollTo('history'); loadPhotos(S.sel, true); return;
     case 'close': return closeBranch();
     case 'editprev': return openBranch(S.sel, +el.dataset.r);
-    case 'mgredit': openBranch(S.sel, +el.dataset.r); S.draft.editing = true; saveDraft(); render(); scrollTo('editor'); return;
+    case 'mgredit': openBranch(S.sel, +el.dataset.r); S.draft.editing = true; render(); scrollTo('editor'); return;
     case 'cat': {
-      readStage();
+      readStage(); commitOpen();
       const k = el.dataset.k, c = S.draft.cats[k];
       S.draft.open = {k, t: c && !c.na ? c.t : '', a: c && !c.na ? c.a : '', na: !!(c && c.na), photo: c && c.photo, photoData: c && c.photoData};
       saveDraft(); render(); setTimeout(() => document.getElementById('stT')?.focus(), 30); return;
     }
-    case 'catclose': readStage(); S.draft.open = null; saveDraft(); return render();
+    case 'catclose': readStage(); commitOpen(); S.draft.open = null; saveDraft(); scheduleAutosave(800); return render();
     case 'catsave': {
       readStage();
       const o = S.draft.open; let v;
@@ -1245,17 +1386,17 @@ document.addEventListener('click', async ev => {
         if(a > tt){ toast(t('err_agt')); return; }
         v = {t:tt, a}; }
       if(o.photo) v.photo = o.photo; if(o.photoData) v.photoData = o.photoData;
-      S.draft.cats[o.k] = v; S.draft.open = null; saveDraft(); return render();
+      S.draft.cats[o.k] = v; S.draft.open = null; saveDraft(); scheduleAutosave(800); return render();
     }
-    case 'rmphoto': delete S.draft.open.photo; delete S.draft.open.photoData; saveDraft(); return render();
+    case 'rmphoto': { const o = S.draft.open; delete o.photo; delete o.photoData; const c = S.draft.cats[o.k]; if(c){ delete c.photo; delete c.photoData; } saveDraft(); scheduleAutosave(); return render(); }
     case 'viewphoto': return openViewer(el.dataset.src, el.dataset.cap);
     case 'save': if(!S.busy) await saveBranch(); return;
     case 'share': return share();
     case 'clear':
       if(S.armed !== 'clear'){ S.armed = 'clear'; render(); setTimeout(() => { if(S.armed === 'clear'){ S.armed = null; render(); } }, 3500); return; }
-      S.armed = null; S.draft.cats = {}; S.draft.open = null; saveDraft(); toast(t('cleared')); return render();
+      S.armed = null; clearTimeout(asvTimer); S.draft.cats = {}; S.draft.open = null; saveDraft(); toast(t('cleared')); return render();
     case 'excel': try{ await exportExcel(); }catch(e){ toast(e.message || t('excelFail'), 4000); } return;
-    case 'tab': S.tab = el.dataset.v; S.sel = null; S.draft = null; return render();
+    case 'tab': flushAutosave(); S.tab = el.dataset.v; S.sel = null; S.draft = null; return render();
     case 'delread': {
       const id = el.dataset.id;
       if(S.armed !== 'del'+id){ S.armed = 'del'+id; return render(); }
@@ -1302,28 +1443,30 @@ document.addEventListener('input', ev => {
   const el = ev.target, k = el.dataset && el.dataset.in; if(!k) return;
   if(k === 'lgPin'){ S.login.pin = el.value; return; }
   if(k === 'aq'){ S.aq = el.value; const pos = el.selectionStart; render(); const n = document.getElementById('aq'); n.focus(); n.setSelectionRange(pos,pos); return; }
-  if(k === 'stT' || k === 'stA'){ readStage(); saveDraft(); updateStageLive(); return; }
+  if(k === 'stT' || k === 'stA'){ readStage(); commitOpen(); saveDraft(); updateStageLive(); scheduleAutosave(); return; }
 });
 document.addEventListener('change', async ev => {
   if(ev.target.dataset && ev.target.dataset.ed){ captureEdit(ev.target); return; }
   const el = ev.target, k = el.dataset && el.dataset.in; if(!k) return;
   if(k === 'lgGov'){ S.login.gov = el.value; S.login.uid = ''; S.login.err = ''; return renderLogin(); }
   if(k === 'lgUser'){ S.login.uid = el.value; S.login.err = ''; return; }
-  if(k === 'fGov'){ S.f.gov = el.value; S.f.sup = 'all'; S.sel = null; S.draft = null; return render(); }
-  if(k === 'fSup'){ S.f.sup = el.value; S.sel = null; S.draft = null; return render(); }
+  if(k === 'fGov'){ flushAutosave(); S.f.gov = el.value; S.f.sup = 'all'; S.sel = null; S.draft = null; return render(); }
+  if(k === 'fSup'){ flushAutosave(); S.f.sup = el.value; S.sel = null; S.draft = null; return render(); }
   if(k === 'bsel'){
     const id = +el.value; if(!id) return;
-    if(isMgr()){ S.sel = id; S.draft = null; S.editRound = null; render(); scrollTo('history'); return; }
+    if(isMgr()){ flushAutosave(); S.sel = id; S.draft = null; S.editRound = null; render(); scrollTo('history'); loadPhotos(id, true); return; }
     return openBranch(id);
   }
-  if(k === 'stNa'){ readStage(); S.draft.open.na = el.checked; saveDraft(); return render(); }
+  if(k === 'stNa'){ readStage(); S.draft.open.na = el.checked; commitOpen(); saveDraft(); scheduleAutosave(); return render(); }
   if(k === 'stPhoto' && el.files && el.files[0]){
     readStage();
-    try{ S.draft.open.photoData = await compress(el.files[0]); delete S.draft.open.photo; saveDraft(); }catch(e){ toast(I18N[LANG].errs.photo); }
+    try{ S.draft.open.photoData = await compress(el.files[0]); delete S.draft.open.photo; commitOpen(); saveDraft(); scheduleAutosave(); }catch(e){ toast(I18N[LANG].errs.photo); }
     return render();
   }
 });
 window.addEventListener('online', () => { S.online = true; render(); syncQueue(); });
+document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'hidden'){ saveDraft(); flushAutosave(); } });
+window.addEventListener('pagehide', () => { saveDraft(); });
 window.addEventListener('offline', () => { S.online = false; render(); });
 setInterval(() => { if(S.user && queue().length && navigator.onLine) syncQueue(); }, 30000);
 
