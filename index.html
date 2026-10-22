@@ -1,135 +1,134 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0f766e"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}img{max-width:100%}</style></head><body>
-<title>حاسبة نسب المساحات</title>
+<!doctype html><html lang="en" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0f766e"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}img{max-width:100%}</style></head><body>
+<title>Shelf Share Calculator</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: one narrow mobile column; managers get the same column widened for tables. */
+/* Layout: one narrow mobile column for supervisors; managers get the same column widened for tables. */
 :root{
-  --bg:#eef3f2; --surface:#ffffff; --sunken:#f5f8f7; --ink:#14201e; --muted:#5b6b67; --line:#d9e3e0;
+  --bg:#eef2f1; --surface:#ffffff; --sunken:#f4f7f6; --ink:#16211f; --muted:#5a6966; --line:#d8e1df;
   --accent:#0f766e; --accent-strong:#0b5a54; --accent-soft:#dcefeb; --on-accent:#ffffff;
   --good:#15803d; --good-soft:#dcf5e3; --bad:#b42318; --bad-soft:#fde3e0; --warn:#a15c07; --warn-soft:#fdf0d5;
   --na:#7d8a87; --na-soft:#e9eeed; --wa:#1d9e4f;
-  --font:'IBM Plex Sans Arabic', Tahoma, 'Segoe UI', Arial, sans-serif;
+  --font:'IBM Plex Sans','IBM Plex Sans Arabic',system-ui,'Segoe UI',Tahoma,Arial,sans-serif;
   --r:12px;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#101716; --surface:#18211f; --sunken:#131b19; --ink:#e7eeec; --muted:#9aaba7; --line:#2b3835;
+    --bg:#101716; --surface:#18211f; --sunken:#131b19; --ink:#e4ecea; --muted:#9aaba7; --line:#2b3835;
     --accent:#2bb3a4; --accent-strong:#46c9ba; --accent-soft:#163633; --on-accent:#05201d;
     --good:#4ade80; --good-soft:#153524; --bad:#f87171; --bad-soft:#3b1717; --warn:#fbbf24; --warn-soft:#3a2c0d;
     --na:#8b9895; --na-soft:#222c2a; --wa:#25c060; color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#101716; --surface:#18211f; --sunken:#131b19; --ink:#e7eeec; --muted:#9aaba7; --line:#2b3835;
+  --bg:#101716; --surface:#18211f; --sunken:#131b19; --ink:#e4ecea; --muted:#9aaba7; --line:#2b3835;
   --accent:#2bb3a4; --accent-strong:#46c9ba; --accent-soft:#163633; --on-accent:#05201d;
   --good:#4ade80; --good-soft:#153524; --bad:#f87171; --bad-soft:#3b1717; --warn:#fbbf24; --warn-soft:#3a2c0d;
   --na:#8b9895; --na-soft:#222c2a; --wa:#25c060; color-scheme:dark;
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-html{direction:rtl}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.5;
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 40px}
 button,input,select{font:inherit;color:inherit}
 .wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
-.wrap.wide{max-width:980px}
+.wrap.wide{max-width:1000px}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.brand{font-weight:700;font-size:18px;text-wrap:balance}
-.brand small{display:block;font-weight:400;font-size:12.5px;color:var(--muted)}
-.who{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.brand{font-weight:600;font-size:18px;letter-spacing:-.01em;text-wrap:balance}
+.brand small{display:block;font-weight:400;font-size:12.5px;color:var(--muted);letter-spacing:0}
+.who{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:12px;min-width:0}
-.card h2{margin:0;font-size:15px}
+.card h2{margin:0;font-size:15.5px;font-weight:600}
 .lbl{font-size:13px;color:var(--muted);margin-bottom:4px;display:block}
 .field{display:flex;flex-direction:column;min-width:0}
 input[type=text],input[type=number],input[type=password],input[type=tel],select{
   width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--sunken);font-size:15px;min-width:0}
-input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.btn{border:none;border-radius:10px;padding:11px 14px;font-weight:700;cursor:pointer;background:var(--sunken);border:1px solid var(--line);text-align:center}
+.btn{border-radius:10px;padding:11px 14px;font-weight:600;cursor:pointer;background:var(--sunken);border:1px solid var(--line);text-align:center}
 .btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
 .btn.wa{background:var(--wa);color:#fff;border-color:var(--wa)}
 .btn.danger{background:transparent;color:var(--bad);border-color:var(--bad)}
 .btn.danger.armed{background:var(--bad);color:#fff}
 .btn.ghost{background:transparent}
 .btn.sm{padding:6px 10px;font-size:13px;font-weight:500}
+.btn.lang{font-weight:600;border-color:var(--accent);color:var(--accent-strong)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.row>.grow{flex:1 1 140px;min-width:0}
+.row>.grow{flex:1 1 150px;min-width:0}
+.between{justify-content:space-between}
 .muted{color:var(--muted);font-size:13px}
 .err{color:var(--bad);font-size:13px}
 .banner{border-radius:10px;padding:9px 12px;font-size:13px;background:var(--warn-soft);color:var(--warn)}
 .banner.info{background:var(--accent-soft);color:var(--accent-strong)}
-/* stat chips */
 .stat{border:1px solid var(--line);background:var(--sunken);border-radius:10px;padding:8px 6px;text-align:center;cursor:pointer}
-.stat b{display:block;font-size:22px;font-variant-numeric:tabular-nums;line-height:1.2}
+.stat b{display:block;font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.2}
 .stat span{font-size:12px;color:var(--muted)}
 .stat.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 .stat.on span{color:var(--on-accent)}
-.round-tag{display:inline-flex;gap:6px;align-items:center;background:var(--accent-soft);color:var(--accent-strong);border-radius:999px;padding:3px 10px;font-size:12.5px;font-weight:700}
-/* branch list */
-.blist{display:flex;flex-direction:column;max-height:300px;overflow:auto;border:1px solid var(--line);border-radius:10px}
-.bitem{display:flex;align-items:center;gap:10px;padding:10px 12px;border:none;border-bottom:1px solid var(--line);background:transparent;text-align:right;cursor:pointer;width:100%}
-.bitem:last-child{border-bottom:none}
-.bitem:hover{background:var(--sunken)}
-.bitem.sel{background:var(--accent-soft)}
-.bitem .nm{flex:1;min-width:0}
-.bitem .sub{font-size:12px;color:var(--muted)}
-.dot{width:10px;height:10px;border-radius:50%;flex:none;background:var(--line);border:2px solid var(--na)}
-.dot.done{background:var(--good);border-color:var(--good)}
-.dot.partial{background:var(--warn);border-color:var(--warn)}
-.dot.pend{background:transparent;border-color:var(--warn);border-style:dashed}
-/* categories */
+.round-tag{display:inline-flex;gap:6px;align-items:center;background:var(--accent-soft);color:var(--accent-strong);border-radius:999px;padding:3px 10px;font-size:12.5px;font-weight:600;white-space:nowrap}
 .cats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.cat{border:1px solid var(--line);background:var(--sunken);border-radius:10px;padding:10px;cursor:pointer;text-align:right;display:flex;flex-direction:column;gap:2px}
-.cat b{font-size:15px}
+.cat{border:1px solid var(--line);background:var(--sunken);border-radius:10px;padding:10px;cursor:pointer;text-align:start;display:flex;flex-direction:column;gap:2px}
+.cat b{font-size:15px;font-weight:600}
 .cat .st{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
-.cat.rec{border-color:var(--accent);}
-.cat.rec .st{color:var(--accent-strong);font-weight:700}
-.cat.na .st{color:var(--na)}
+.cat.rec{border-color:var(--accent)}
+.cat.rec .st{color:var(--accent-strong);font-weight:600}
+.cat.rec.below{border-color:var(--bad)} .cat.rec.below .st{color:var(--bad)}
+.cat.rec.above{border-color:var(--good)} .cat.rec.above .st{color:var(--good)}
+.cat.na .st{color:var(--na);font-weight:500}
 .cat.open{outline:2px solid var(--accent)}
 .stage{border:1px dashed var(--accent);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--sunken)}
-.pct{text-align:center;font-size:26px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
-.pct.badv{color:var(--bad)}
+.pct{text-align:center;font-size:26px;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}
+.pct.badv{color:var(--bad)} .pct.below{color:var(--bad)} .pct.above{color:var(--good)}
+.gapline{text-align:center;font-size:13px;font-variant-numeric:tabular-nums}
 .check{display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer}
 .check input{width:18px;height:18px}
-.thumb{width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
-/* tables */
+.thumb{width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid var(--line);cursor:zoom-in}
 .tw{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
 table{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
 th,td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:center;white-space:nowrap}
-th{background:var(--sunken);font-weight:700;font-size:12.5px;color:var(--muted)}
-td.l,th.l{text-align:right}
-tr.tot td{font-weight:700;background:var(--sunken)}
-.up{background:var(--good-soft);color:var(--good);font-weight:700}
-.down{background:var(--bad-soft);color:var(--bad);font-weight:700}
+th{background:var(--sunken);font-weight:600;font-size:12.5px;color:var(--muted)}
+td.l,th.l{text-align:start}
+tr.tot td{font-weight:600;background:var(--sunken)}
+td small{display:block;font-size:11.5px;font-weight:500}
+.up{background:var(--good-soft);color:var(--good);font-weight:600}
+.down{background:var(--bad-soft);color:var(--bad);font-weight:600}
 .nacell{background:var(--na-soft);color:var(--na)}
+.trend{font-size:11px;opacity:.8;margin-inline-start:3px}
 .bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden;min-width:70px}
 .bar i{display:block;height:100%;background:var(--accent)}
 .tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);overflow-x:auto}
-.tab{border:none;background:none;padding:9px 12px;cursor:pointer;color:var(--muted);font-weight:700;border-bottom:3px solid transparent;white-space:nowrap}
+.tab{border:none;background:none;padding:9px 12px;cursor:pointer;color:var(--muted);font-weight:600;border-bottom:3px solid transparent;white-space:nowrap}
 .tab.on{color:var(--accent-strong);border-bottom-color:var(--accent)}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
 .kpi{background:var(--sunken);border:1px solid var(--line);border-radius:10px;padding:10px}
 .kpi .k{font-size:12px;color:var(--muted)}
-.kpi .v{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.kpi .v{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
 .kpi .s{font-size:12px;color:var(--muted)}
+.pill{display:inline-block;padding:0 6px;border-radius:5px}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px}
+.gallery figure{margin:0;display:flex;flex-direction:column;gap:4px}
+.gallery img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;border:1px solid var(--line);cursor:zoom-in}
+.gallery figcaption{font-size:12px;color:var(--muted)}
+.photo-btn{border:none;background:none;cursor:pointer;padding:0 2px;font-size:13px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;z-index:50;max-width:calc(100% - 32px);text-align:center}
-.photo-view{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:60;padding:20px}
-.photo-view img{max-height:90vh;border-radius:8px}
+.photo-view{position:fixed;inset:0;background:rgba(0,0,0,.88);display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;z-index:60;padding:20px;color:#fff}
+.photo-view img{max-height:82vh;border-radius:8px}
 a{color:var(--accent-strong)}
 @media (max-width:420px){.grid3{gap:6px}.stat b{font-size:19px}}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 
-<div id="app" class="wrap"><div class="card"><div class="muted">جاري التحميل…</div></div></div>
+<div id="app" class="wrap"><div class="card"><div class="muted">Loading…</div></div></div>
 <div id="toast" class="toast" hidden></div>
-<div id="pv" class="photo-view" hidden><img id="pvImg" alt="صورة الرف"></div>
+<div id="pv" class="photo-view" hidden><img id="pvImg" alt=""><div id="pvCap"></div></div>
 
 <script>
-/* ===================== الإعدادات ===================== */
+/* ===================== Config ===================== */
 const CONFIG = {
   SUPABASE_URL: "https://gbhdjpmuoutrudkgbvjf.supabase.co",
   SUPABASE_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdiaGRqcG11b3V0cnVka2didmpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2NDg0OTYsImV4cCI6MjEwODIyNDQ5Nn0.irVaX41yUNktoueDNkQILzzq-rV81Q2BBqsUmSUqrw8"
@@ -137,52 +136,205 @@ const CONFIG = {
 const SEED = /*SEED*/null;
 const DEMO = !CONFIG.SUPABASE_URL || CONFIG.SUPABASE_URL.startsWith('/*');
 
-const CATS = [{k:'yog',n:'الزبادى'},{k:'drk',n:'المشروبات'},{k:'pud',n:'البودينج'},{k:'milk',n:'اللبن'}];
-const GOVS = {Cairo:'القاهرة',Giza:'الجيزة',Alex:'الإسكندرية'};
-const ROLES = {sup:'مسؤول فروع',gov:'مسؤول عام',analyst:'داتا أناليست',admin:'مدير'};
-const ERRS = {
-  bad_pin:'الرمز السري غير صحيح', locked:'تم إيقاف الدخول 15 دقيقة بسبب محاولات خاطئة كثيرة',
-  locked_reading:'القراءة دي اتقفلت. التعديل بقى متاح لمديرك فقط', forbidden:'مش مسموح لك بالعملية دي',
-  actual_gt_total:'المساحة الفعلية لا يمكن أن تكون أكبر من الكلية', invalid:'البيانات غير مكتملة أو غير صحيحة',
-  no_branch:'الفرع غير موجود', bad_new_pin:'الرمز لازم يكون من 4 لـ 8 أرقام', network:'مفيش اتصال بالإنترنت'
-};
+/* ===================== Language ===================== */
+const I18N = {
+en:{
+  appTitle:'Shelf Share Calculator', appSub:'Shelf space readings by branch',
+  demo:'Demo version: data stays on this device only. The PIN for everyone is 1234', demoShort:'Demo version: data stays on this device only',
+  login:'Sign in', gov:'Governorate', chooseGov:'Choose governorate', mgmt:'Management', user:'Name', chooseName:'Choose your name',
+  pin:'PIN', signIn:'Sign in', signingIn:'Signing in…', needName:'Choose your name', needPin:'Enter your PIN',
+  refresh:'Refresh', logout:'Sign out', pendingN:'{n} waiting to upload ⟳',
+  offline:'No internet right now. Anything you save stays on this phone and uploads automatically when you are back online.',
+  yourBranches:'Your branches', readingN:'Reading {n}', total:'Total branches', done:'Recorded', left:'Remaining',
+  exportCur:'Export Excel (current reading)', exportX:'Export Excel',
+  chooseBranch:'Choose a branch', grpLeft:'Remaining ({n})', grpDone:'Recorded ({n})', allDone:'All branches are recorded in this reading', noBranches:'No branches',
+  st_none:'not recorded', st_partial:'categories missing', st_done:'complete', st_pend:'on phone, waiting to upload',
+  lockedNote:'This branch was recorded in the current reading on {d}. Only your manager can edit it now.', locked:'This reading is locked.',
+  editToday:'Edit what you recorded today (reading {n})', editTodayNote:'You can edit this branch today only. It locks after that.',
+  lastEdit:'Last edited {d} by {u}', categories:'Categories', notRec:'Not recorded', na:'Not available in this branch', naShort:'N/A',
+  needAll:'Record all four categories to complete the branch.',
+  save:'Save', saveShare:'Save & share on WhatsApp', share:'Share on WhatsApp', clear:'Clear', clearConfirm:'Tap again to confirm', back:'Back to branches',
+  waFallback:"If WhatsApp didn't open, tap here", close:'Close',
+  naCheck:'This category is not available in the branch', totalArea:'Total shelf', actualArea:'Actual shelf',
+  err_t0:'Total shelf must be more than zero', err_aneg:'Actual shelf cannot be negative', err_agt:'Actual shelf cannot be more than the total shelf',
+  photoAdd:'📷 Shelf photo (optional)', photoChange:'📷 Change photo', photoRemove:'Remove photo', record:'Record',
+  thCat:'Category', thTotal:'Total', thActual:'Actual', thPct:'Share', overall:'Overall',
+  targetIs:'Target {v}', gap:'Short {p} pts · {s} of shelf', onTarget:'On or above target',
+  savedComplete:'Saved. Branch complete', savedPartial:'Saved. Some categories still missing', savedLocal:'Saved on this phone. It will upload when you are back online',
+  needOne:'Record at least one category', enterBoth:'Enter the total and actual shelf', cleared:'Cleared from the screen. Record the categories again and tap Save.',
+  uploadedAll:'Everything saved on this phone has been uploaded', uploadFail:'A saved reading could not be uploaded: ', offlineCache:'Working from data saved on this phone', refreshed:'Refreshed',
+  shTitle:'📊 Shelf share reading', shGov:'Governorate', shBranch:'Branch', shSup:'Supervisor', shRound:'Reading', shDate:'Date', shOverall:'Overall share', shSentBy:'Sent by', shTot:'Total', shAct:'Actual', shTarget:'target', shShort:'short',
+  allGovs:'All governorates', allSups:'All supervisors', supervisor:'Supervisor', tabDash:'Overview', tabBranches:'Branches', tabAdmin:'Admin',
+  progressTitle:'Progress in the current reading', kRecorded:'Branches recorded', kRate:'Completion', kLeft:'{n} branches left',
+  kBelow:'Branches below target', kBelowSub:'latest reading vs target', kDrop:'Branches that dropped', kDropSub:'vs previous reading',
+  thSup:'Supervisor', thGov:'Governorate', thRound:'Reading', thDoneTotal:'Done / Total', thProgress:'Progress', thAvg:'Avg. latest share', thBelow:'Below',
+  catAvgTitle:'Average share by category', catAvgNote:'Latest complete reading for each branch, weighted by shelf size',
+  prevLbl:'Previous {v}', noTarget:'No target set',
+  redTitleT:'Branches below target', redTitleP:'Branches that dropped vs previous reading', noneRed:'None.',
+  thBranch:'Branch', thPrev:'Previous', thCur:'Latest', thDiff:'Diff (pts)', thTarget:'Target', thGapShelf:'Shelf short',
+  branchesTitle:'Branches', statusNote:'Status follows each supervisor’s current reading',
+  partialTag:'(partial)', edit:'Edit', del:'Delete', confirm:'Confirm', noReadings:'No readings for this branch yet.', enterCur:'Enter current reading ({n})', inactive:'Inactive',
+  photosTitle:'Shelf photos', noPhotos:'No shelf photos for this branch yet. Supervisors add them with the 📷 button while recording.', deleted:'Reading deleted',
+  usersTitle:'People and PINs', thName:'Name', thRole:'Access level', thTitle:'Job title', thActive:'Active', thNewPin:'New PIN', keep:'unchanged',
+  titlePh:'Shown instead of access level', newUserName:'New person’s name', pinHint:'PIN (4–8 digits)', add:'Add',
+  pinNote:'PINs are stored encrypted and cannot be viewed later. Send the new PIN to the person yourself.',
+  needNameT:'Enter the name', needGov:'Choose the governorate', savedT:'Saved', pinSaved:'Saved. The new PIN works now',
+  newBranch:'New branch', branchName:'Branch name', searchBranches:'Search branches ({n})', first150:'Showing the first 150 branches. Use search or the filters.',
+  deactNote:'Turning a branch off removes it from the remaining list without deleting its old readings.', branchAdded:'Branch added', needBranchName:'Enter the branch name',
+  targetsTitle:'Target shares', targetsNote:'A share below its target shows red with the gap; equal or above shows green. Leave a category empty to compare with the previous reading instead.',
+  saveTargets:'Save targets', targetsSaved:'Targets saved',
+  sheetReadings:'Readings', sheetSummary:'Summary', notStarted:'Not started', fromTo:'{a} to {b}', inactiveSfx:' (inactive)',
+  exporting:'Preparing Excel…', exported:'Excel file downloaded', excelFail:'Could not export Excel', libFail:'Could not load the Excel library. Check the internet connection.',
+  sumHead:['Supervisor','Governorate','Current reading','Total branches','Recorded','Remaining','Completion'],
+  readingHdr:'Reading {n}', gapNote:'Short {p} pts ({s} of shelf) vs target {t}',
+  photoCap:'{c} · reading {r}', viewPhoto:'View shelf photo',
+  errs:{ bad_pin:'Wrong PIN', locked:'Too many wrong tries. Sign-in is paused for 15 minutes', locked_reading:'This reading is locked. Only your manager can edit it now',
+    forbidden:'You do not have permission for this', actual_gt_total:'Actual shelf cannot be more than the total shelf', invalid:'Some data is missing or not valid',
+    no_branch:'Branch not found', bad_new_pin:'The PIN must be 4 to 8 digits', network:'No internet connection', server:'Server error', photo:'Could not upload the photo', generic:'Something went wrong' },
+  roles:{sup:'Branch Supervisor', gov:'Area Manager', analyst:'Data Analyst', admin:'Manager'},
+  cats:{yog:'Yogurt', drk:'Drinks', pud:'Pudding', milk:'Milk'},
+  govs:{Cairo:'Cairo', Giza:'Giza', Alex:'Alexandria'},
+  langBtn:'عربي'
+},
+ar:{
+  appTitle:'حاسبة نسب المساحات', appSub:'قراءات المساحات على الرفوف حسب الفرع',
+  demo:'نسخة تجريبية: البيانات بتتحفظ على الجهاز ده بس، والرمز السري لكل المسؤولين 1234', demoShort:'نسخة تجريبية: البيانات بتتحفظ على الجهاز ده بس',
+  login:'الدخول', gov:'المحافظة', chooseGov:'اختار المحافظة', mgmt:'الإدارة', user:'المسؤول', chooseName:'اختار اسمك',
+  pin:'الرمز السري', signIn:'دخول', signingIn:'جاري الدخول…', needName:'اختار اسمك', needPin:'اكتب الرمز السري',
+  refresh:'تحديث', logout:'خروج', pendingN:'{n} مستني الرفع ⟳',
+  offline:'مفيش إنترنت دلوقتي. أي حفظ هيتسجل على الموبايل ويترفع لوحده لما النت يرجع.',
+  yourBranches:'فروعك', readingN:'القراءة {n}', total:'إجمالي الفروع', done:'اتسجلت', left:'المتبقي',
+  exportCur:'استخراج إكسيل (القراءة الحالية)', exportX:'استخراج إكسيل',
+  chooseBranch:'اختار الفرع', grpLeft:'المتبقي ({n})', grpDone:'اتسجلت ({n})', allDone:'كل الفروع اتسجلت في القراءة دي', noBranches:'لا توجد فروع',
+  st_none:'لم تسجل', st_partial:'ناقص فئات', st_done:'مكتمل', st_pend:'على الموبايل، مستني الرفع',
+  lockedNote:'الفرع ده اتسجل في القراءة الحالية بتاريخ {d}. التعديل بقى متاح لمديرك فقط.', locked:'القراءة دي اتقفلت.',
+  editToday:'تعديل اللي سجلته النهارده (القراءة {n})', editTodayNote:'تقدر تعدل الفرع ده النهارده بس، وبعد كده يتقفل.',
+  lastEdit:'آخر تعديل {d} بواسطة {u}', categories:'الفئات', notRec:'لم تسجل', na:'غير متوفرة في الفرع', naShort:'غير متوفر',
+  needAll:'سجل الفئات الأربعة علشان الفرع يتحسب مكتمل.',
+  save:'حفظ', saveShare:'حفظ ومشاركة واتساب', share:'مشاركة واتساب', clear:'مسح البيانات', clearConfirm:'اضغط تاني للتأكيد', back:'رجوع للفروع',
+  waFallback:'لو واتساب ما فتحش، اضغط هنا', close:'إغلاق',
+  naCheck:'الفئة غير متوفرة في الفرع', totalArea:'المساحة الكلية', actualArea:'المساحة الفعلية',
+  err_t0:'المساحة الكلية لازم تكون أكبر من صفر', err_aneg:'المساحة الفعلية لا يمكن أن تكون سالبة', err_agt:'المساحة الفعلية لا يمكن أن تكون أكبر من الكلية',
+  photoAdd:'📷 صورة الرف (اختياري)', photoChange:'📷 تغيير الصورة', photoRemove:'حذف الصورة', record:'تسجيل',
+  thCat:'الفئة', thTotal:'الكلية', thActual:'الفعلية', thPct:'النسبة', overall:'الإجمالي',
+  targetIs:'المستهدف {v}', gap:'ناقص {p} نقطة · {s} من الرف', onTarget:'وصلت للمستهدف أو أعلى',
+  savedComplete:'تم الحفظ. الفرع مكتمل', savedPartial:'تم الحفظ. باقي فئات لم تسجل', savedLocal:'اتحفظ على الموبايل، وهيترفع لوحده لما النت يرجع',
+  needOne:'سجل فئة واحدة على الأقل', enterBoth:'اكتب المساحة الكلية والفعلية', cleared:'اتمسحت البيانات من الشاشة. سجل الفئات من جديد واضغط حفظ.',
+  uploadedAll:'تم رفع كل البيانات المحفوظة على الموبايل', uploadFail:'لم يتم رفع قراءة محفوظة على الموبايل: ', offlineCache:'شغال من البيانات المحفوظة على الموبايل', refreshed:'تم التحديث',
+  shTitle:'📊 قراءة نسب المساحات', shGov:'المحافظة', shBranch:'الفرع', shSup:'المسؤول', shRound:'القراءة رقم', shDate:'التاريخ', shOverall:'النسبة الإجمالية', shSentBy:'أرسلها', shTot:'الكلية', shAct:'الفعلية', shTarget:'المستهدف', shShort:'ناقص',
+  allGovs:'كل المحافظات', allSups:'كل المسؤولين', supervisor:'المسؤول', tabDash:'المتابعة', tabBranches:'الفروع', tabAdmin:'الإدارة',
+  progressTitle:'الإنجاز في القراءة الحالية', kRecorded:'الفروع المسجلة', kRate:'نسبة الإنجاز', kLeft:'{n} فرع متبقي',
+  kBelow:'فروع تحت المستهدف', kBelowSub:'آخر قراءة مقابل المستهدف', kDrop:'فروع نسبتها نزلت', kDropSub:'مقارنة بالقراءة السابقة',
+  thSup:'المسؤول', thGov:'المحافظة', thRound:'القراءة', thDoneTotal:'تم / الإجمالي', thProgress:'الإنجاز', thAvg:'متوسط آخر قراءة', thBelow:'تحت',
+  catAvgTitle:'متوسط كل فئة', catAvgNote:'آخر قراءة مكتملة لكل فرع، مرجحة بحجم الرف',
+  prevLbl:'السابقة {v}', noTarget:'لا يوجد مستهدف',
+  redTitleT:'الفروع اللي تحت المستهدف', redTitleP:'الفروع اللي نسبتها نزلت عن القراءة السابقة', noneRed:'لا يوجد.',
+  thBranch:'الفرع', thPrev:'السابقة', thCur:'الأخيرة', thDiff:'الفرق (نقطة)', thTarget:'المستهدف', thGapShelf:'الناقص من الرف',
+  branchesTitle:'الفروع', statusNote:'الحالة حسب القراءة الحالية لكل مسؤول',
+  partialTag:'(ناقص)', edit:'تعديل', del:'حذف', confirm:'تأكيد', noReadings:'لا توجد قراءات لهذا الفرع بعد.', enterCur:'إدخال القراءة الحالية ({n})', inactive:'موقوف',
+  photosTitle:'صور الرفوف', noPhotos:'لا توجد صور لهذا الفرع بعد. المسؤول بيضيفها بزرار 📷 وهو بيسجل.', deleted:'تم حذف القراءة',
+  usersTitle:'المسؤولين والرموز السرية', thName:'الاسم', thRole:'الصلاحية', thTitle:'المسمى الوظيفي', thActive:'نشط', thNewPin:'رمز جديد', keep:'بدون تغيير',
+  titlePh:'يظهر بدل اسم الصلاحية', newUserName:'اسم مسؤول جديد', pinHint:'رمز (4-8 أرقام)', add:'إضافة',
+  pinNote:'الرمز بيتحفظ مشفر ومحدش يقدر يشوفه بعد الحفظ. ابعته للمسؤول بنفسك.',
+  needNameT:'اكتب الاسم', needGov:'اختار المحافظة', savedT:'اتحفظ', pinSaved:'اتحفظ والرمز الجديد شغال',
+  newBranch:'فرع جديد', branchName:'اسم الفرع', searchBranches:'ابحث في الفروع ({n})', first150:'بيظهر أول 150 فرع. استخدم البحث أو الفلاتر.',
+  deactNote:'إيقاف الفرع بيخرجه من الفروع المتبقية من غير ما قراءاته القديمة تتمسح.', branchAdded:'تمت إضافة الفرع', needBranchName:'اكتب اسم الفرع',
+  targetsTitle:'النسب المستهدفة', targetsNote:'النسبة الأقل من المستهدف تظهر بالأحمر مع الناقص، والمساوية أو الأعلى بالأخضر. لو سبت فئة فاضية، هتتقارن بالقراءة السابقة بدلًا من المستهدف.',
+  saveTargets:'حفظ المستهدف', targetsSaved:'اتحفظ المستهدف',
+  sheetReadings:'القراءات', sheetSummary:'الملخص', notStarted:'لم تبدأ', fromTo:'من {a} إلى {b}', inactiveSfx:' (موقوف)',
+  exporting:'جاري تجهيز الإكسيل…', exported:'تم تنزيل ملف الإكسيل', excelFail:'تعذر استخراج الإكسيل', libFail:'تعذر تحميل مكتبة الإكسيل. تأكد من الإنترنت.',
+  sumHead:['المسؤول','المحافظة','القراءة الحالية','إجمالي الفروع','اتسجلت','المتبقي','نسبة الإنجاز'],
+  readingHdr:'القراءة {n}', gapNote:'ناقص {p} نقطة ({s} من الرف) عن المستهدف {t}',
+  photoCap:'{c} · القراءة {r}', viewPhoto:'عرض صورة الرف',
+  errs:{ bad_pin:'الرمز السري غير صحيح', locked:'تم إيقاف الدخول 15 دقيقة بسبب محاولات خاطئة كثيرة', locked_reading:'القراءة دي اتقفلت. التعديل بقى متاح لمديرك فقط',
+    forbidden:'مش مسموح لك بالعملية دي', actual_gt_total:'المساحة الفعلية لا يمكن أن تكون أكبر من الكلية', invalid:'البيانات غير مكتملة أو غير صحيحة',
+    no_branch:'الفرع غير موجود', bad_new_pin:'الرمز لازم يكون من 4 لـ 8 أرقام', network:'مفيش اتصال بالإنترنت', server:'خطأ في الخادم', photo:'تعذر رفع الصورة', generic:'حصل خطأ' },
+  roles:{sup:'مسؤول فروع', gov:'مسؤول عام', analyst:'محلل بيانات', admin:'مدير'},
+  cats:{yog:'الزبادى', drk:'المشروبات', pud:'البودينج', milk:'اللبن'},
+  govs:{Cairo:'القاهرة', Giza:'الجيزة', Alex:'الإسكندرية'},
+  langBtn:'English'
+}};
+const CAT_KEYS = ['yog','drk','pud','milk'];
+const GOV_KEYS = ['Cairo','Giza','Alex'];
 
-/* ===================== أدوات ===================== */
+/* ===================== Utilities ===================== */
 const store = {
   get(k){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; }catch(e){ return null; } },
   set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); return true; }catch(e){ return false; } },
   del(k){ try{ localStorage.removeItem(k); }catch(e){} }
 };
+let LANG = store.get('lang') || 'en';
+function t(key, vars){
+  let s = I18N[LANG][key]; if(s == null) s = I18N.en[key]; if(s == null) return key;
+  if(vars && typeof s === 'string') for(const [k,v] of Object.entries(vars)) s = s.split('{'+k+'}').join(v);
+  return s;
+}
+const catName = k => I18N[LANG].cats[k];
+const govName = g => g ? I18N[LANG].govs[g] || g : '';
+const roleName = r => I18N[LANG].roles[r] || r;
+const jobTitle = u => (u && u.title) || roleName(u && u.role);
+function applyLang(){
+  document.documentElement.lang = LANG;
+  document.documentElement.dir = LANG === 'ar' ? 'rtl' : 'ltr';
+  document.title = t('appTitle');
+}
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clone = o => JSON.parse(JSON.stringify(o));
 const cairoDate = ts => new Date(ts).toLocaleDateString('en-CA',{timeZone:'Africa/Cairo'});
 const isToday = ts => ts && cairoDate(ts) === cairoDate(Date.now());
 const fmtDate = ts => { const d = cairoDate(ts).split('-'); return `${d[2]}/${d[1]}/${d[0]}`; };
-const num = v => { const n = parseFloat(String(v).replace(',', '.')); return isNaN(n) ? null : n; };
+const num = v => { const n = parseFloat(String(v ?? '').replace(',', '.')); return isNaN(n) ? null : n; };
 const fmtN = n => (Math.round(n*100)/100).toLocaleString('en-US',{maximumFractionDigits:2});
 const fmtP = p => p == null ? '—' : (p*100).toFixed(2) + '%';
-function mkErr(code){ const e = new Error(ERRS[code] || code); e.code = code; return e; }
+const fmtT = p => p == null ? '—' : (+(p*100).toFixed(2)) + '%';
+function mkErr(code){ const e = new Error(I18N[LANG].errs[code] || code); e.code = code; return e; }
 function catPct(c){ if(!c || c.na) return null; return c.t > 0 ? c.a / c.t : null; }
 function totalPct(cats){
-  let t = 0, a = 0, any = false;
-  CATS.forEach(({k}) => { const c = cats && cats[k]; if(c && !c.na){ t += +c.t; a += +c.a; any = true; } });
-  return any && t > 0 ? a / t : null;
+  let tt = 0, a = 0, any = false;
+  CAT_KEYS.forEach(k => { const c = cats && cats[k]; if(c && !c.na){ tt += +c.t; a += +c.a; any = true; } });
+  return any && tt > 0 ? a / tt : null;
 }
 function checkCats(cats){
   let n = 0;
   for(const [k,v] of Object.entries(cats || {})){
-    if(!CATS.some(c => c.k === k)) throw mkErr('invalid');
+    if(!CAT_KEYS.includes(k)) throw mkErr('invalid');
     if(v.na){ n++; continue; }
-    const t = num(v.t), a = num(v.a);
-    if(t == null || a == null || t <= 0 || a < 0) throw mkErr('invalid');
-    if(a > t) throw mkErr('actual_gt_total');
+    const tt = num(v.t), a = num(v.a);
+    if(tt == null || a == null || tt <= 0 || a < 0) throw mkErr('invalid');
+    if(a > tt) throw mkErr('actual_gt_total');
     n++;
   }
   return n === 4;
 }
 
-/* ===================== قاعدة البيانات: Supabase ===================== */
-// المفاتيح الجديدة (sb_publishable_...) بتتبعت في apikey بس؛ القديمة (anon JWT) في الاتنين
+/* ---------- Targets ---------- */
+const targets = () => (S.data && S.data.targets) || {};
+const hasTargets = () => CAT_KEYS.some(k => targets()[k] != null);
+// gap for one category: null when no target is set
+function catGap(k, c){
+  const tg = targets()[k]; const p = catPct(c);
+  if(tg == null || p == null) return null;
+  return {target:tg, pct:p, pts:(tg - p)*100, shelf: tg * c.t - c.a, below: p < tg};
+}
+// overall target, weighted by the shelf size of categories that have a target
+// (a category without a target counts as already on target, so it neither adds nor hides a gap)
+function totalGap(cats){
+  let tt=0, a=0, need=0, any=false;
+  CAT_KEYS.forEach(k => { const c = cats && cats[k], tg = targets()[k];
+    if(c && !c.na){ tt+=+c.t; a+=+c.a; if(tg != null){ need += tg*c.t; any=true; } else need += +c.a; } });
+  if(!any || !tt) return null;
+  const tg = need/tt, p = a/tt;
+  return {target:tg, pct:p, pts:(tg-p)*100, shelf:need - a, below: p < tg};
+}
+// colour for a share: against target first, otherwise against the previous reading
+function shareClass(p, target, prev){
+  if(p == null) return '';
+  if(target != null) return p >= target ? 'up' : 'down';
+  if(prev != null) return p >= prev ? 'up' : 'down';
+  return '';
+}
+
+/* ===================== Database: Supabase ===================== */
 function authHeaders(ct){
   const h = {'apikey':CONFIG.SUPABASE_KEY,'Content-Type':ct};
   if(!CONFIG.SUPABASE_KEY.startsWith('sb_')) h['Authorization'] = 'Bearer ' + CONFIG.SUPABASE_KEY;
@@ -191,15 +343,10 @@ function authHeaders(ct){
 class RemoteBackend {
   async rpc(fn, args){
     let res;
-    try{
-      res = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/rpc/${fn}`, {
-        method:'POST',
-        headers:authHeaders('application/json'),
-        body: JSON.stringify(args || {})
-      });
-    }catch(e){ throw mkErr('network'); }
+    try{ res = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/rpc/${fn}`, {method:'POST', headers:authHeaders('application/json'), body: JSON.stringify(args || {})}); }
+    catch(e){ throw mkErr('network'); }
     const body = await res.json().catch(() => null);
-    if(!res.ok){ throw mkErr(body && body.message || 'خطأ في الخادم'); }
+    if(!res.ok) throw mkErr(body && body.message || 'server');
     if(body && body.error) throw mkErr(body.error);
     return body;
   }
@@ -209,68 +356,56 @@ class RemoteBackend {
   saveReading(u,p,branch,cats,round){ return this.rpc('save_reading',{p_user:u,p_pin:p,p_branch:branch,p_cats:cats,p_round:round ?? null}); }
   deleteReading(u,p,id){ return this.rpc('admin_delete_reading',{p_user:u,p_pin:p,p_id:id}); }
   saveBranch(u,p,b){ return this.rpc('admin_save_branch',{p_user:u,p_pin:p,p_id:b.id ?? null,p_gov:b.gov,p_name:b.name,p_sup:b.sup_id,p_active:b.active}); }
-  saveUser(u,p,x){ return this.rpc('admin_save_user',{p_user:u,p_pin:p,p_id:x.id,p_name:x.name,p_role:x.role,p_gov:x.gov || null,p_active:x.active,p_new_pin:x.pin || null}); }
+  saveUser(u,p,x){ return this.rpc('admin_save_user',{p_user:u,p_pin:p,p_id:x.id,p_name:x.name,p_role:x.role,p_gov:x.gov || null,p_active:x.active,p_new_pin:x.pin || null,p_title:x.title || null}); }
+  saveTargets(u,p,tg){ return this.rpc('admin_save_targets',{p_user:u,p_pin:p,p_targets:tg}); }
   async uploadPhoto(dataUrl, path){
     const blob = await (await fetch(dataUrl)).blob();
     let res;
-    try{
-      res = await fetch(`${CONFIG.SUPABASE_URL}/storage/v1/object/shelves/${path}`, {
-        method:'POST', headers:authHeaders('image/jpeg'), body: blob });
-    }catch(e){ throw mkErr('network'); }
-    if(!res.ok) throw mkErr('تعذر رفع الصورة');
+    try{ res = await fetch(`${CONFIG.SUPABASE_URL}/storage/v1/object/shelves/${path}`, {method:'POST', headers:authHeaders('image/jpeg'), body: blob}); }
+    catch(e){ throw mkErr('network'); }
+    if(!res.ok) throw mkErr('photo');
     return path;
   }
   photoUrl(ref){ return ref && ref.startsWith('data:') ? ref : `${CONFIG.SUPABASE_URL}/storage/v1/object/public/shelves/${ref}`; }
 }
 
-/* ===================== وضع التجربة (على الجهاز فقط) ===================== */
+/* ===================== Demo backend (this device only) ===================== */
 class LocalBackend {
   constructor(){
-    this.db = store.get('demo-db');
+    this.db = store.get('demo-db2');
     if(!this.db){
-      this.db = { users: SEED.users.map(u => ({...u, pin:'1234', active:true})), branches: clone(SEED.branches), readings: [], seq: 1, fails:{} };
+      this.db = { users: SEED.users.map(u => ({...u, pin:'1234', active:true, title:null})), branches: clone(SEED.branches), readings: [], seq: 1, targets:{} };
       this.persist();
     }
   }
-  persist(){ store.set('demo-db', this.db); }
-  auth(id, pin){
-    const u = this.db.users.find(x => x.id === id && x.active !== false);
-    if(!u || u.pin !== pin) throw mkErr('bad_pin');
-    return u;
-  }
-  pub(u){ return {id:u.id,name:u.name,role:u.role,gov:u.gov}; }
+  persist(){ store.set('demo-db2', this.db); }
+  auth(id, pin){ const u = this.db.users.find(x => x.id === id && x.active !== false); if(!u || u.pin !== pin) throw mkErr('bad_pin'); return u; }
+  pub(u){ return {id:u.id,name:u.name,role:u.role,gov:u.gov,title:u.title||null}; }
   supRound(sid){
-    const mine = this.db.branches.filter(b => b.sup_id === sid);
-    const ids = new Set(mine.map(b => b.id));
+    const mine = this.db.branches.filter(b => b.sup_id === sid), ids = new Set(mine.map(b => b.id));
     const rs = this.db.readings.filter(r => ids.has(r.branch_id));
     const r = rs.reduce((m,x) => Math.max(m, x.round), 0);
     if(r === 0) return 1;
-    const open = mine.some(b => b.active && !rs.some(x => x.branch_id === b.id && x.round === r && x.complete));
-    return open ? r : r + 1;
+    return mine.some(b => b.active && !rs.some(x => x.branch_id === b.id && x.round === r && x.complete)) ? r : r + 1;
   }
   async listUsers(){ return this.db.users.filter(u => u.active !== false).map(u => this.pub(u)); }
   async login(id,pin){ return this.pub(this.auth(id,pin)); }
   async getData(id,pin){
     const u = this.auth(id,pin);
     if(u.role === 'sup'){
-      const r = this.supRound(u.id);
-      const br = this.db.branches.filter(b => b.sup_id === u.id && b.active);
-      const ids = new Set(br.map(b => b.id));
+      const r = this.supRound(u.id), br = this.db.branches.filter(b => b.sup_id === u.id && b.active), ids = new Set(br.map(b => b.id));
       const rd = this.db.readings.filter(x => ids.has(x.branch_id) && (x.round === r || (x.created_by === u.id && isToday(x.created_at))));
-      return clone({user:this.pub(u), round:r, branches:br, readings:rd, users:[]});
+      return clone({user:this.pub(u), round:r, branches:br, readings:rd, users:[], targets:this.db.targets});
     }
     const all = u.role === 'admin' || u.role === 'analyst';
-    const br = this.db.branches.filter(b => all || b.gov === u.gov);
-    const ids = new Set(br.map(b => b.id));
+    const br = this.db.branches.filter(b => all || b.gov === u.gov), ids = new Set(br.map(b => b.id));
     return clone({user:this.pub(u), round:null, branches:br, readings:this.db.readings.filter(x => ids.has(x.branch_id)),
-      users:this.db.users.map(x => ({id:x.id,name:x.name,role:x.role,gov:x.gov,active:x.active !== false}))});
+      users:this.db.users.map(x => ({id:x.id,name:x.name,role:x.role,gov:x.gov,title:x.title||null,active:x.active !== false})), targets:this.db.targets});
   }
   async saveReading(id,pin,branchId,cats,round){
-    const u = this.auth(id,pin);
-    const b = this.db.branches.find(x => x.id === branchId);
+    const u = this.auth(id,pin), b = this.db.branches.find(x => x.id === branchId);
     if(!b) throw mkErr('no_branch');
-    const done = checkCats(cats);
-    let r;
+    const done = checkCats(cats); let r;
     if(u.role === 'sup'){
       if(b.sup_id !== u.id || !b.active) throw mkErr('forbidden');
       r = this.supRound(u.id);
@@ -288,7 +423,7 @@ class LocalBackend {
     }
     const now = new Date().toISOString();
     let ex = this.db.readings.find(x => x.branch_id === branchId && x.round === r);
-    if(ex){ Object.assign(ex, {cats:clone(cats), complete:done, updated_at:now, updated_by:u.id}); }
+    if(ex) Object.assign(ex, {cats:clone(cats), complete:done, updated_at:now, updated_by:u.id});
     else { ex = {id:this.db.seq++, branch_id:branchId, round:r, sup_id:b.sup_id, cats:clone(cats), complete:done, created_at:now, updated_at:now, created_by:u.id, updated_by:u.id}; this.db.readings.push(ex); }
     this.persist();
     return clone({reading:ex, round: u.role === 'sup' ? this.supRound(u.id) : null});
@@ -305,25 +440,24 @@ class LocalBackend {
   async saveUser(id,pin,x){
     const u = this.auth(id,pin); if(u.role !== 'admin') throw mkErr('forbidden');
     if(x.pin && !/^[0-9]{4,8}$/.test(x.pin)) throw mkErr('bad_new_pin');
-    let t = this.db.users.find(y => y.id === x.id);
-    if(t){ Object.assign(t, {name:(x.name||'').trim()||t.name, role:x.role, gov:x.gov||null, active:x.active !== false}); if(x.pin) t.pin = x.pin; }
-    else { if(!x.pin) throw mkErr('bad_new_pin'); this.db.users.push({id:x.id,name:x.name.trim(),role:x.role,gov:x.gov||null,active:x.active !== false,pin:x.pin}); }
+    let y = this.db.users.find(z => z.id === x.id);
+    if(y){ Object.assign(y, {name:(x.name||'').trim()||y.name, role:x.role, gov:x.gov||null, title:(x.title||'').trim()||null, active:x.active !== false}); if(x.pin) y.pin = x.pin; }
+    else { if(!x.pin) throw mkErr('bad_new_pin'); this.db.users.push({id:x.id,name:x.name.trim(),role:x.role,gov:x.gov||null,title:(x.title||'').trim()||null,active:x.active !== false,pin:x.pin}); }
     this.persist(); return {ok:true};
   }
+  async saveTargets(id,pin,tg){ const u = this.auth(id,pin); if(u.role !== 'admin') throw mkErr('forbidden'); this.db.targets = clone(tg); this.persist(); return {ok:true, targets:tg}; }
   async uploadPhoto(dataUrl){ return dataUrl; }
   photoUrl(ref){ return ref; }
 }
 
 const API = DEMO ? new LocalBackend() : new RemoteBackend();
 
-/* ===================== الحالة ===================== */
+/* ===================== State ===================== */
 const S = {
-  sess: store.get('sess'),        // {id, pin}
-  user: null, data: null, users: store.get('users-cache') || [],
+  sess: store.get('sess'), user: null, data: null, users: store.get('users-cache') || [],
   login: {gov:'', uid:'', pin:'', err:''},
-  filter: 'all',                   // all | done | left
-  q: '', sel: null, editRound: null, draft: null,
-  tab: 'dash', f: {gov:'all', sup:'all'},
+  filter: 'all', sel: null, editRound: null, draft: null,
+  tab: 'dash', f: {gov:'all', sup:'all'}, aq: '',
   armed: null, online: navigator.onLine, busy: false, waLink: null
 };
 const qKey = () => 'queue:' + S.user.id;
@@ -331,24 +465,22 @@ const dKey = () => 'draft:' + S.user.id;
 const isMgr = () => S.user && S.user.role !== 'sup';
 const canEdit = () => S.user && ['gov','analyst','admin'].includes(S.user.role);
 const isAdmin = () => S.user && S.user.role === 'admin';
+function toast(msg, ms=2600){ const el = document.getElementById('toast'); el.textContent = msg; el.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => el.hidden = true, ms); }
 
-function toast(msg, ms=2600){ const t = document.getElementById('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => t.hidden = true, ms); }
-
-/* ---------- القراءات ---------- */
+/* ---------- Readings ---------- */
 const readingsOf = bid => S.data.readings.filter(r => r.branch_id === bid).sort((a,b) => a.round - b.round);
 const readingAt = (bid, round) => S.data.readings.find(r => r.branch_id === bid && r.round === round);
 const branchById = id => S.data.branches.find(b => b.id === id);
-const userName = id => (S.data.users.find(u => u.id === id) || S.users.find(u => u.id === id) || {}).name || (S.user && S.user.id === id ? S.user.name : '—');
+const findUser = id => (S.data && S.data.users.find(u => u.id === id)) || S.users.find(u => u.id === id) || (S.user && S.user.id === id ? S.user : null);
+const userName = id => (findUser(id) || {}).name || '—';
 
 function roundFor(supId){
-  const mine = S.data.branches.filter(b => b.sup_id === supId);
-  const ids = new Set(mine.map(b => b.id));
+  const mine = S.data.branches.filter(b => b.sup_id === supId), ids = new Set(mine.map(b => b.id));
   const rs = S.data.readings.filter(r => ids.has(r.branch_id));
   let r = rs.reduce((m,x) => Math.max(m, x.round), 0);
   if(S.user.role === 'sup') r = Math.max(r, S.data.round || 1);
   if(r === 0) return 1;
-  const open = mine.some(b => b.active && !rs.some(x => x.branch_id === b.id && x.round === r && x.complete));
-  return open ? r : r + 1;
+  return mine.some(b => b.active && !rs.some(x => x.branch_id === b.id && x.round === r && x.complete)) ? r : r + 1;
 }
 function branchStatus(b){
   const rd = readingAt(b.id, roundFor(b.sup_id));
@@ -363,9 +495,9 @@ function editable(b, round){
   return !!rd && rd.created_by === S.user.id && isToday(rd.created_at);
 }
 
-/* ---------- الطابور (حفظ بدون إنترنت) ---------- */
-function queue(){ return store.get(qKey()) || []; }
-function setQueue(q){ store.set(qKey(), q); }
+/* ---------- Offline queue ---------- */
+const queue = () => store.get(qKey()) || [];
+const setQueue = q => store.set(qKey(), q);
 function applyLocal(bid, round, cats, extra){
   let rd = readingAt(bid, round);
   const now = new Date().toISOString();
@@ -379,13 +511,12 @@ function mergeServerReading(rd){
   S.data.readings.push(rd);
 }
 function cacheData(){ if(S.user) store.set('data:' + S.user.id, S.data); }
-
 async function pushOne(item){
   const cats = clone(item.cats);
-  for(const c of CATS){
-    const v = cats[c.k];
+  for(const k of CAT_KEYS){
+    const v = cats[k];
     if(v && v.photoData){
-      const path = `${new Date().toISOString().slice(0,7)}/${item.branch}-r${item.round}-${c.k}-${Date.now()}.jpg`;
+      const path = `${new Date().toISOString().slice(0,7)}/${item.branch}-r${item.round}-${k}-${Date.now()}.jpg`;
       v.photo = await API.uploadPhoto(v.photoData, path);
       delete v.photoData;
     }
@@ -401,30 +532,23 @@ async function syncQueue(){
   let q = queue(); if(!q.length) return;
   while(q.length){
     try{ await pushOne(q[0]); q.shift(); setQueue(q); }
-    catch(e){
-      if(e.code === 'network') break;
-      toast('لم يتم رفع قراءة محفوظة على الجهاز: ' + e.message, 5000);
-      q.shift(); setQueue(q);
-    }
+    catch(e){ if(e.code === 'network') break; toast(t('uploadFail') + e.message, 5000); q.shift(); setQueue(q); }
   }
-  if(!queue().length) toast('تم رفع كل البيانات المحفوظة على الجهاز');
+  if(!queue().length) toast(t('uploadedAll'));
   render();
 }
 
-/* ---------- المسودة ---------- */
+/* ---------- Draft ---------- */
 function openBranch(bid, round){
   const b = branchById(bid);
   const R = round ?? roundFor(b.sup_id);
   S.sel = bid; S.editRound = R; S.armed = null; S.waLink = null;
   const d = store.get(dKey());
-  if(d && d.branch === bid && d.round === R){ S.draft = d; }
-  else {
-    const rd = readingAt(bid, R);
-    S.draft = {branch:bid, round:R, cats: rd ? clone(rd.cats) : {}, open:null};
-  }
-  saveDraft(); render();
-  setTimeout(() => { const el = document.getElementById('editor'); if(el) el.scrollIntoView({behavior:'smooth', block:'start'}); }, 30);
+  if(d && d.branch === bid && d.round === R) S.draft = d;
+  else { const rd = readingAt(bid, R); S.draft = {branch:bid, round:R, cats: rd ? clone(rd.cats) : {}, open:null}; }
+  saveDraft(); render(); scrollTo('editor');
 }
+function scrollTo(id){ setTimeout(() => { const el = document.getElementById(id); if(el) el.scrollIntoView({behavior:'smooth', block:'start'}); }, 40); }
 function saveDraft(){ if(S.draft) store.set(dKey(), S.draft); }
 function closeBranch(){ S.sel = null; S.draft = null; S.editRound = null; S.waLink = null; store.del(dKey()); render(); }
 function draftDirty(){
@@ -433,8 +557,9 @@ function draftDirty(){
   return JSON.stringify(S.draft.cats) !== JSON.stringify(rd ? rd.cats : {});
 }
 
-/* ===================== تسجيل الدخول ===================== */
+/* ===================== Sign in ===================== */
 async function boot(){
+  applyLang();
   if(S.sess){
     const cached = store.get('data:' + S.sess.id);
     if(cached){ S.data = cached; S.user = cached.user; restoreDraft(); render(); }
@@ -442,10 +567,9 @@ async function boot(){
     catch(e){
       if(e.code === 'bad_pin' || e.code === 'locked'){ logout(); toast(e.message); return; }
       if(!S.data){ S.login.err = e.message; renderLogin(); return; }
-      toast('شغال من البيانات المحفوظة على الجهاز');
+      toast(t('offlineCache'));
     }
-    syncQueue();
-    return;
+    syncQueue(); return;
   }
   renderLogin();
   try{ S.users = await API.listUsers(); store.set('users-cache', S.users); renderLogin(); }
@@ -453,9 +577,8 @@ async function boot(){
 }
 async function loadData(){
   const d = await API.getData(S.sess.id, S.sess.pin);
-  // نحتفظ بالقراءات اللي لسه ما اترفعتش
   const pend = S.data ? S.data.readings.filter(r => r.pending) : [];
-  S.data = d; S.user = d.user;
+  S.data = d; S.user = d.user; if(!S.data.targets) S.data.targets = {};
   pend.forEach(p => { S.data.readings = S.data.readings.filter(x => !(x.branch_id === p.branch_id && x.round === p.round)); S.data.readings.push(p); });
   cacheData(); restoreDraft(); render();
 }
@@ -468,203 +591,203 @@ function restoreDraft(){
   S.draft = d; S.sel = d.branch; S.editRound = d.round;
 }
 function logout(){
-  if(S.user){ store.del('data:' + S.user.id); }
+  if(S.user) store.del('data:' + S.user.id);
   store.del('sess'); S.sess = null; S.user = null; S.data = null; S.sel = null; S.draft = null;
   S.login = {gov:'', uid:'', pin:'', err:''};
   boot();
 }
 async function doLogin(){
   const {uid, pin} = S.login;
-  if(!uid){ S.login.err = 'اختار اسمك'; return renderLogin(); }
-  if(!pin){ S.login.err = 'اكتب الرمز السري'; return renderLogin(); }
+  if(!uid){ S.login.err = t('needName'); return renderLogin(); }
+  if(!pin){ S.login.err = t('needPin'); return renderLogin(); }
   S.busy = true; renderLogin();
-  try{
-    await API.login(uid, pin);
-    S.sess = {id:uid, pin}; store.set('sess', S.sess);
-    await loadData(); syncQueue();
-  }catch(e){ S.login.err = e.message; S.busy = false; renderLogin(); }
+  try{ await API.login(uid, pin); S.sess = {id:uid, pin}; store.set('sess', S.sess); await loadData(); syncQueue(); }
+  catch(e){ S.login.err = e.message; S.busy = false; renderLogin(); }
   S.busy = false;
 }
+const langBtn = () => `<button class="btn sm lang" data-act="lang" lang="${LANG==='en'?'ar':'en'}">${t('langBtn')}</button>`;
 
 function renderLogin(){
-  const app = document.getElementById('app');
-  app.className = 'wrap';
-  const L = S.login;
-  const groups = [...Object.keys(GOVS), 'mgmt'];
+  const app = document.getElementById('app'); app.className = 'wrap';
+  const L = S.login, groups = [...GOV_KEYS, 'mgmt'];
   const inGroup = g => S.users.filter(u => g === 'mgmt' ? !u.gov : u.gov === g);
   app.innerHTML = `
-    <div class="topbar"><div class="brand">حاسبة نسب المساحات<small>قراءات المساحات على الرفوف حسب الفرع</small></div></div>
-    ${DEMO ? `<div class="banner">نسخة تجريبية: البيانات بتتحفظ على الجهاز ده بس، والرمز السري لكل المسؤولين 1234</div>` : ''}
+    <div class="topbar"><div class="brand">${t('appTitle')}<small>${t('appSub')}</small></div><div class="who">${langBtn()}</div></div>
+    ${DEMO ? `<div class="banner">${t('demo')}</div>` : ''}
     <div class="card">
-      <h2>الدخول</h2>
-      <div class="field"><label class="lbl" for="lgGov">المحافظة</label>
-        <select id="lgGov" data-in="lgGov"><option value="">اختار المحافظة</option>
-          ${groups.map(g => `<option value="${g}" ${L.gov===g?'selected':''}>${g==='mgmt'?'الإدارة':GOVS[g]}</option>`).join('')}
+      <h2>${t('login')}</h2>
+      <div class="field"><label class="lbl" for="lgGov">${t('gov')}</label>
+        <select id="lgGov" data-in="lgGov"><option value="">${t('chooseGov')}</option>
+          ${groups.map(g => `<option value="${g}" ${L.gov===g?'selected':''}>${g==='mgmt'?t('mgmt'):govName(g)}</option>`).join('')}
         </select></div>
-      <div class="field"><label class="lbl" for="lgUser">المسؤول</label>
-        <select id="lgUser" data-in="lgUser" ${L.gov?'':'disabled'}><option value="">اختار اسمك</option>
-          ${L.gov ? inGroup(L.gov).map(u => `<option value="${u.id}" ${L.uid===u.id?'selected':''}>${esc(u.name)} — ${ROLES[u.role]}</option>`).join('') : ''}
+      <div class="field"><label class="lbl" for="lgUser">${t('user')}</label>
+        <select id="lgUser" data-in="lgUser" ${L.gov?'':'disabled'}><option value="">${t('chooseName')}</option>
+          ${L.gov ? inGroup(L.gov).map(u => `<option value="${u.id}" ${L.uid===u.id?'selected':''}>${esc(u.name)} — ${esc(jobTitle(u))}</option>`).join('') : ''}
         </select></div>
-      <div class="field"><label class="lbl" for="lgPin">الرمز السري</label>
+      <div class="field"><label class="lbl" for="lgPin">${t('pin')}</label>
         <input id="lgPin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="8" data-in="lgPin" value="${esc(L.pin)}"></div>
       ${L.err ? `<div class="err">${esc(L.err)}</div>` : ''}
-      <button class="btn primary" data-act="login" ${S.busy?'disabled':''}>${S.busy?'جاري الدخول…':'دخول'}</button>
+      <button class="btn primary" data-act="login" ${S.busy?'disabled':''}>${S.busy?t('signingIn'):t('signIn')}</button>
     </div>`;
 }
 
-/* ===================== الشاشة الرئيسية ===================== */
+/* ===================== Main screen ===================== */
 function render(){
+  applyLang();
   if(!S.user || !S.data) return renderLogin();
   const app = document.getElementById('app');
   app.className = isMgr() ? 'wrap wide' : 'wrap';
   const q = queue().length;
-  const top = `
+  const me = findUser(S.user.id) || S.user;
+  app.innerHTML = `
     <div class="topbar">
-      <div class="brand">حاسبة نسب المساحات<small>${esc(S.user.name)} · ${ROLES[S.user.role]}${S.user.gov ? ' · ' + GOVS[S.user.gov] : ''}</small></div>
+      <div class="brand">${t('appTitle')}<small>${esc(S.user.name)} · ${esc(jobTitle(me))}${S.user.gov ? ' · ' + govName(S.user.gov) : ''}</small></div>
       <div class="who">
-        ${q ? `<button class="btn sm" data-act="sync" title="رفع البيانات">${q} مستني الرفع ⟳</button>` : ''}
-        <button class="btn sm ghost" data-act="refresh">تحديث</button>
-        <button class="btn sm ghost" data-act="logout">خروج</button>
+        ${q ? `<button class="btn sm" data-act="sync">${t('pendingN',{n:q})}</button>` : ''}
+        ${langBtn()}
+        <button class="btn sm ghost" data-act="refresh">${t('refresh')}</button>
+        <button class="btn sm ghost" data-act="logout">${t('logout')}</button>
       </div>
     </div>
-    ${DEMO ? `<div class="banner">نسخة تجريبية: البيانات بتتحفظ على الجهاز ده بس</div>` : ''}
-    ${!S.online ? `<div class="banner">مفيش إنترنت دلوقتي. أي حفظ هيتسجل على الجهاز ويترفع لوحده لما النت يرجع.</div>` : ''}`;
-  app.innerHTML = top + (isMgr() ? renderManager() : renderSup());
+    ${DEMO ? `<div class="banner">${t('demoShort')}</div>` : ''}
+    ${!S.online ? `<div class="banner">${t('offline')}</div>` : ''}
+    ${isMgr() ? renderManager() : renderSup()}`;
 }
 
-/* ---------- مسؤول الفروع ---------- */
-function renderSup(){
-  const R = roundFor(S.user.id);
-  const br = S.data.branches.filter(b => b.active);
-  const st = br.map(b => ({b, s: branchStatus(b)}));
-  const done = st.filter(x => x.s === 'done').length;
-  return `
-    <div class="card">
-      <div class="row" style="justify-content:space-between"><h2>فروعك</h2><span class="round-tag">القراءة رقم ${R}</span></div>
-      ${statChips(st.length, done)}
-      ${branchPicker(st)}
-      <button class="btn sm" data-act="excel">استخراج إكسيل (القراءة الحالية)</button>
-    </div>
-    ${S.sel ? renderEditor() : ''}`;
-}
+/* ---------- Branch picker (dropdown) ---------- */
 function statChips(total, done){
   const f = S.filter;
   return `<div class="grid3">
-    <button class="stat ${f==='all'?'on':''}" data-act="filter" data-v="all"><b>${total}</b><span>إجمالي الفروع</span></button>
-    <button class="stat ${f==='done'?'on':''}" data-act="filter" data-v="done"><b>${done}</b><span>اتسجلت</span></button>
-    <button class="stat ${f==='left'?'on':''}" data-act="filter" data-v="left"><b>${total-done}</b><span>المتبقي</span></button>
+    <button class="stat ${f==='all'?'on':''}" data-act="filter" data-v="all"><b>${total}</b><span>${t('total')}</span></button>
+    <button class="stat ${f==='done'?'on':''}" data-act="filter" data-v="done"><b>${done}</b><span>${t('done')}</span></button>
+    <button class="stat ${f==='left'?'on':''}" data-act="filter" data-v="left"><b>${total-done}</b><span>${t('left')}</span></button>
   </div>`;
 }
-function branchPicker(st){
-  const f = S.filter, q = S.q.trim();
-  let list = st.filter(x => f === 'all' || (f === 'done' ? x.s === 'done' : x.s !== 'done'));
-  if(q) list = list.filter(x => x.b.name.includes(q));
-  const lbl = {none:'لم تسجل', partial:'ناقص فئات', done:'مكتمل', pend:'على الجهاز — مستني الرفع'};
-  return `
-    <input type="text" id="bq" data-in="bq" placeholder="ابحث باسم الفرع" value="${esc(S.q)}">
-    <div class="blist" role="list">
-      ${list.length ? list.map(({b,s}) => `
-        <button class="bitem ${S.sel===b.id?'sel':''}" data-act="open" data-id="${b.id}" role="listitem">
-          <span class="dot ${s==='done'?'done':s==='partial'?'partial':s==='pend'?'pend':''}"></span>
-          <span class="nm">${esc(b.name)}<div class="sub">${lbl[s]}${isMgr() ? ' · ' + esc(userName(b.sup_id)) + ' · ' + GOVS[b.gov] : ''}</div></span>
-        </button>`).join('') : `<div class="muted" style="padding:12px">${f==='left' ? 'كل الفروع اتسجلت في القراءة دي' : 'لا توجد فروع'}</div>`}
-    </div>`;
+function branchSelect(st){
+  const f = S.filter;
+  const left = st.filter(x => x.s !== 'done'), done = st.filter(x => x.s === 'done');
+  const mark = {none:'', partial:' · ' + t('st_partial'), pend:' · ' + t('st_pend'), done:' ✓'};
+  const extra = b => isMgr() && S.f.sup === 'all' ? ' — ' + userName(b.sup_id) : '';
+  const opt = ({b,s}) => `<option value="${b.id}" ${S.sel===b.id?'selected':''}>${esc(b.name)}${esc(extra(b))}${mark[s]}</option>`;
+  const groups = [];
+  if(f !== 'done') groups.push(`<optgroup label="${t('grpLeft',{n:left.length})}">${left.map(opt).join('')}</optgroup>`);
+  if(f !== 'left') groups.push(`<optgroup label="${t('grpDone',{n:done.length})}">${done.map(opt).join('')}</optgroup>`);
+  const empty = f === 'left' && !left.length;
+  return `<div class="field"><label class="lbl" for="bsel">${t('chooseBranch')}</label>
+    <select id="bsel" data-in="bsel" ${empty?'disabled':''}><option value="">${empty ? t('allDone') : t('chooseBranch') + '…'}</option>${groups.join('')}</select></div>`;
 }
 
-/* ---------- محرر القراءة ---------- */
+/* ---------- Branch supervisor ---------- */
+function renderSup(){
+  const R = roundFor(S.user.id);
+  const st = S.data.branches.filter(b => b.active).map(b => ({b, s: branchStatus(b)}));
+  const done = st.filter(x => x.s === 'done').length;
+  return `
+    <div class="card">
+      <div class="row between"><h2>${t('yourBranches')}</h2><span class="round-tag">${t('readingN',{n:R})}</span></div>
+      ${statChips(st.length, done)}
+      ${branchSelect(st)}
+      <button class="btn sm" data-act="excel">${t('exportCur')}</button>
+    </div>
+    ${S.sel ? renderEditor() : ''}`;
+}
+
+/* ---------- Reading editor ---------- */
 function renderEditor(){
-  const b = branchById(S.sel); if(!b) return '';
-  const d = S.draft, R = d.round;
-  const rd = readingAt(b.id, R);
-  const can = editable(b, R);
-  const sup = S.user.role === 'sup';
-  // تعديل قراءة النهارده من القراءة السابقة
+  const b = branchById(S.sel); if(!b || !S.draft) return '';
+  const d = S.draft, R = d.round, rd = readingAt(b.id, R), can = editable(b, R), sup = S.user.role === 'sup';
   const prevToday = sup ? S.data.readings.find(x => x.branch_id === b.id && x.round !== R && x.created_by === S.user.id && isToday(x.created_at)) : null;
   const cats = d.cats;
-  const head = `
-    <div class="row" style="justify-content:space-between">
-      <div><h2>${esc(b.name)}</h2><div class="muted">${GOVS[b.gov]} · ${esc(userName(b.sup_id))}</div></div>
-      <span class="round-tag">القراءة ${R}</span>
-    </div>`;
-  if(!can && !rd){
-    return `<div class="card" id="editor">${head}<div class="banner info">القراءة دي اتقفلت.</div><button class="btn" data-act="close">رجوع للفروع</button></div>`;
-  }
-  if(!can){
-    return `<div class="card" id="editor">${head}
-      <div class="banner info">الفرع ده اتسجل في القراءة الحالية بتاريخ ${fmtDate(rd.created_at)}. التعديل بقى متاح لمديرك فقط.</div>
+  const head = `<div class="row between">
+      <div><h2>${esc(b.name)}</h2><div class="muted">${govName(b.gov)} · ${esc(userName(b.sup_id))}</div></div>
+      <span class="round-tag">${t('readingN',{n:R})}</span></div>`;
+  const wa = S.waLink ? `<a href="${esc(S.waLink)}" target="_blank" rel="noopener">${t('waFallback')}</a>` : '';
+  if(!can && !rd) return `<div class="card" id="editor">${head}<div class="banner info">${t('locked')}</div><button class="btn" data-act="close">${t('back')}</button></div>`;
+  if(!can) return `<div class="card" id="editor">${head}
+      <div class="banner info">${t('lockedNote',{d:fmtDate(rd.created_at)})}</div>
       ${summaryTable(rd.cats)}
-      <div class="grid2"><button class="btn wa" data-act="share">مشاركة واتساب</button><button class="btn" data-act="close">رجوع للفروع</button></div>
-      ${S.waLink ? `<a href="${esc(S.waLink)}" target="_blank" rel="noopener">لو واتساب ما فتحش، اضغط هنا</a>` : ''}
-    </div>`;
-  }
-  const o = d.open;
+      <div class="grid2"><button class="btn wa" data-act="share">${t('share')}</button><button class="btn" data-act="close">${t('back')}</button></div>${wa}</div>`;
+  const o = d.open, n = Object.keys(cats).length;
   return `<div class="card" id="editor">${head}
-    ${prevToday ? `<button class="btn sm" data-act="editprev" data-r="${prevToday.round}">تعديل اللي سجلته النهارده (القراءة ${prevToday.round})</button>` : ''}
-    ${rd && rd.complete && sup ? `<div class="banner info">تقدر تعدل الفرع ده النهارده بس، وبعد كده يتقفل.</div>` : ''}
-    ${rd && canEdit() ? `<div class="muted">آخر تعديل: ${fmtDate(rd.updated_at)} بواسطة ${esc(userName(rd.updated_by))}</div>` : ''}
-    <div><span class="lbl">الفئات</span>
+    ${prevToday ? `<button class="btn sm" data-act="editprev" data-r="${prevToday.round}">${t('editToday',{n:prevToday.round})}</button>` : ''}
+    ${rd && rd.complete && sup ? `<div class="banner info">${t('editTodayNote')}</div>` : ''}
+    ${rd && canEdit() ? `<div class="muted">${t('lastEdit',{d:fmtDate(rd.updated_at), u:esc(userName(rd.updated_by))})}</div>` : ''}
+    <div><span class="lbl">${t('categories')}</span>
     <div class="cats">
-      ${CATS.map(({k,n}) => { const c = cats[k];
-        const stt = !c ? 'لم تسجل' : c.na ? 'غير متوفرة في الفرع' : `${fmtN(c.t)} / ${fmtN(c.a)} · ${fmtP(catPct(c))}`;
-        return `<button class="cat ${c?(c.na?'na rec':'rec'):''} ${o&&o.k===k?'open':''}" data-act="cat" data-k="${k}"><b>${n}${c && (c.photo||c.photoData) ? ' 📷' : ''}</b><span class="st">${stt}</span></button>`; }).join('')}
+      ${CAT_KEYS.map(k => { const c = cats[k], g = c && !c.na ? catGap(k, c) : null;
+        const stt = !c ? t('notRec') : c.na ? t('na') : `${fmtN(c.t)} / ${fmtN(c.a)} · ${fmtP(catPct(c))}`;
+        const cls = !c ? '' : c.na ? 'na rec' : 'rec' + (g ? (g.below ? ' below' : ' above') : '');
+        return `<button class="cat ${cls} ${o&&o.k===k?'open':''}" data-act="cat" data-k="${k}"><b>${catName(k)}${c && (c.photo||c.photoData) ? ' 📷' : ''}</b><span class="st">${stt}</span></button>`; }).join('')}
     </div></div>
     ${o ? stageHtml(o) : ''}
-    ${Object.keys(cats).length ? summaryTable(cats) : `<div class="muted">سجل الفئات الأربعة علشان الفرع يتحسب مكتمل.</div>`}
+    ${n ? summaryTable(cats) : `<div class="muted">${t('needAll')}</div>`}
     <div class="grid2">
-      <button class="btn primary" data-act="save" ${Object.keys(cats).length?'':'disabled'}>حفظ</button>
-      <button class="btn wa" data-act="share" ${Object.keys(cats).length?'':'disabled'}>حفظ ومشاركة واتساب</button>
+      <button class="btn primary" data-act="save" ${n?'':'disabled'}>${t('save')}</button>
+      <button class="btn wa" data-act="share" ${n?'':'disabled'}>${t('saveShare')}</button>
     </div>
     <div class="grid2">
-      <button class="btn danger ${S.armed==='clear'?'armed':''}" data-act="clear">${S.armed==='clear'?'اضغط تاني للتأكيد':'مسح البيانات'}</button>
-      <button class="btn" data-act="close">رجوع للفروع</button>
-    </div>
-    ${S.waLink ? `<a href="${esc(S.waLink)}" target="_blank" rel="noopener">لو واتساب ما فتحش، اضغط هنا</a>` : ''}
+      <button class="btn danger ${S.armed==='clear'?'armed':''}" data-act="clear">${S.armed==='clear'?t('clearConfirm'):t('clear')}</button>
+      <button class="btn" data-act="close">${t('back')}</button>
+    </div>${wa}
   </div>`;
+}
+function stageEval(o){
+  const tt = num(o.t), a = num(o.a); let msg = '', p = null;
+  if(!o.na && tt != null && a != null){
+    if(tt <= 0) msg = t('err_t0'); else if(a < 0) msg = t('err_aneg'); else if(a > tt) msg = t('err_agt'); else p = a / tt;
+  }
+  const g = p != null ? catGap(o.k, {t:tt, a}) : null;
+  return {msg, p, g};
+}
+function gapText(g){
+  if(!g) return '';
+  return g.below ? `<span style="color:var(--bad)">${t('targetIs',{v:fmtT(g.target)})} · ${t('gap',{p:g.pts.toFixed(2), s:fmtN(g.shelf)})}</span>`
+                 : `<span style="color:var(--good)">${t('targetIs',{v:fmtT(g.target)})} · ${t('onTarget')}</span>`;
 }
 function stageHtml(o){
-  const t = num(o.t), a = num(o.a);
-  let msg = '', p = null;
-  if(!o.na && t != null && a != null){
-    if(t <= 0) msg = 'المساحة الكلية لازم تكون أكبر من صفر';
-    else if(a < 0) msg = 'المساحة الفعلية لا يمكن أن تكون سالبة';
-    else if(a > t) msg = 'المساحة الفعلية لا يمكن أن تكون أكبر من الكلية';
-    else p = a / t;
-  }
+  const {msg, p, g} = stageEval(o);
   const ok = o.na || (p != null);
-  const n = CATS.find(c => c.k === o.k).n;
   const photo = o.photoData || (o.photo ? API.photoUrl(o.photo) : null);
   return `<div class="stage">
-    <div class="row" style="justify-content:space-between"><b>${n}</b><button class="btn sm ghost" data-act="catclose">إغلاق</button></div>
-    <label class="check"><input type="checkbox" id="stNa" data-in="stNa" ${o.na?'checked':''}> الفئة غير متوفرة في الفرع</label>
+    <div class="row between"><b>${catName(o.k)}</b><button class="btn sm ghost" data-act="catclose">${t('close')}</button></div>
+    <label class="check"><input type="checkbox" id="stNa" data-in="stNa" ${o.na?'checked':''}> ${t('naCheck')}</label>
     ${o.na ? '' : `
     <div class="grid2">
-      <div class="field"><label class="lbl" for="stT">المساحة الكلية</label><input id="stT" type="number" inputmode="decimal" step="any" min="0" data-in="stT" value="${esc(o.t ?? '')}" placeholder="0"></div>
-      <div class="field"><label class="lbl" for="stA">المساحة الفعلية</label><input id="stA" type="number" inputmode="decimal" step="any" min="0" data-in="stA" value="${esc(o.a ?? '')}" placeholder="0"></div>
+      <div class="field"><label class="lbl" for="stT">${t('totalArea')}</label><input id="stT" type="number" inputmode="decimal" step="any" min="0" data-in="stT" value="${esc(o.t ?? '')}" placeholder="0"></div>
+      <div class="field"><label class="lbl" for="stA">${t('actualArea')}</label><input id="stA" type="number" inputmode="decimal" step="any" min="0" data-in="stA" value="${esc(o.a ?? '')}" placeholder="0"></div>
     </div>
-    <div class="pct ${msg?'badv':''}" id="stP">${p != null ? fmtP(p) : '0%'}</div>
+    <div class="pct ${msg?'badv':g?(g.below?'below':'above'):''}" id="stP">${p != null ? fmtP(p) : '0%'}</div>
+    <div class="gapline" id="stG">${gapText(g)}</div>
     <div class="err" id="stMsg">${msg}</div>`}
     <div class="row">
-      <label class="btn sm" for="stPhoto">📷 ${photo ? 'تغيير صورة الرف' : 'صورة الرف (اختياري)'}</label>
+      <label class="btn sm" for="stPhoto">${photo ? t('photoChange') : t('photoAdd')}</label>
       <input id="stPhoto" type="file" accept="image/*" capture="environment" hidden data-in="stPhoto">
-      ${photo ? `<img class="thumb" src="${esc(photo)}" alt="صورة الرف" data-act="viewphoto" data-src="${esc(photo)}"><button class="btn sm ghost" data-act="rmphoto">حذف الصورة</button>` : ''}
+      ${photo ? `<img class="thumb" src="${esc(photo)}" alt="${t('viewPhoto')}" data-act="viewphoto" data-src="${esc(photo)}" data-cap="${esc(catName(o.k))}"><button class="btn sm ghost" data-act="rmphoto">${t('photoRemove')}</button>` : ''}
     </div>
-    <button class="btn primary" data-act="catsave" id="stSave" ${ok?'':'disabled'}>تسجيل</button>
+    <button class="btn primary" data-act="catsave" id="stSave" ${ok?'':'disabled'}>${t('record')}</button>
   </div>`;
 }
-function summaryTable(cats){
-  const tp = totalPct(cats);
-  let tt = 0, ta = 0;
-  return `<div class="tw"><table>
-    <thead><tr><th class="l">الفئة</th><th>الكلية</th><th>الفعلية</th><th>النسبة</th></tr></thead>
-    <tbody>
-    ${CATS.filter(c => cats[c.k]).map(({k,n}) => { const c = cats[k];
-      if(c.na) return `<tr><td class="l">${n}</td><td colspan="3" class="nacell">غير متوفرة في الفرع</td></tr>`;
-      tt += +c.t; ta += +c.a;
-      return `<tr><td class="l">${n}</td><td>${fmtN(c.t)}</td><td>${fmtN(c.a)}</td><td>${fmtP(catPct(c))}</td></tr>`; }).join('')}
-    <tr class="tot"><td class="l">النسبة الإجمالية</td><td>${fmtN(tt)}</td><td>${fmtN(ta)}</td><td>${fmtP(tp)}</td></tr>
-    </tbody></table></div>`;
+function photoBtn(c, cap){
+  const ref = c && (c.photoData || c.photo); if(!ref) return '';
+  return `<button class="photo-btn" data-act="viewphoto" data-src="${esc(c.photoData || API.photoUrl(c.photo))}" data-cap="${esc(cap)}" title="${t('viewPhoto')}" aria-label="${t('viewPhoto')}">📷</button>`;
 }
-
+function summaryTable(cats){
+  let tt = 0, ta = 0;
+  const tg = totalGap(cats);
+  return `<div class="tw"><table>
+    <thead><tr><th class="l">${t('thCat')}</th><th>${t('thTotal')}</th><th>${t('thActual')}</th><th>${t('thPct')}</th></tr></thead>
+    <tbody>
+    ${CAT_KEYS.filter(k => cats[k]).map(k => { const c = cats[k];
+      if(c.na) return `<tr><td class="l">${catName(k)}</td><td colspan="3" class="nacell">${t('na')}</td></tr>`;
+      tt += +c.t; ta += +c.a;
+      const g = catGap(k, c), cls = g ? (g.below ? 'down' : 'up') : '';
+      return `<tr><td class="l">${catName(k)} ${photoBtn(c, catName(k))}</td><td>${fmtN(c.t)}</td><td>${fmtN(c.a)}</td>
+        <td class="${cls}">${fmtP(catPct(c))}${g && g.below ? `<small>−${g.pts.toFixed(2)} · ${fmtN(g.shelf)}</small>` : ''}</td></tr>`; }).join('')}
+    <tr class="tot"><td class="l">${t('overall')}</td><td>${fmtN(tt)}</td><td>${fmtN(ta)}</td>
+      <td class="${tg ? (tg.below ? 'down' : 'up') : ''}">${fmtP(totalPct(cats))}${tg && tg.below ? `<small>−${tg.pts.toFixed(2)} · ${fmtN(tg.shelf)}</small>` : ''}</td></tr>
+    </tbody></table></div>
+    ${hasTargets() ? `<div class="muted">${t('thTarget')}: ${CAT_KEYS.filter(k => targets()[k] != null).map(k => `${catName(k)} ${fmtT(targets()[k])}`).join(' · ')}</div>` : ''}`;
+}
 function readStage(){
   const o = S.draft && S.draft.open; if(!o) return;
   const T = document.getElementById('stT'), A = document.getElementById('stA');
@@ -672,20 +795,13 @@ function readStage(){
 }
 function updateStageLive(){
   const o = S.draft.open; if(!o || o.na) return;
-  const t = num(o.t), a = num(o.a);
-  let msg = '', p = null;
-  if(t != null && a != null){
-    if(t <= 0) msg = 'المساحة الكلية لازم تكون أكبر من صفر';
-    else if(a < 0) msg = 'المساحة الفعلية لا يمكن أن تكون سالبة';
-    else if(a > t) msg = 'المساحة الفعلية لا يمكن أن تكون أكبر من الكلية';
-    else p = a / t;
-  }
-  const P = document.getElementById('stP'), M = document.getElementById('stMsg'), B = document.getElementById('stSave');
-  if(P){ P.textContent = p != null ? fmtP(p) : '0%'; P.classList.toggle('badv', !!msg); }
+  const {msg, p, g} = stageEval(o);
+  const P = document.getElementById('stP'), M = document.getElementById('stMsg'), B = document.getElementById('stSave'), G = document.getElementById('stG');
+  if(P){ P.textContent = p != null ? fmtP(p) : '0%'; P.className = 'pct ' + (msg ? 'badv' : g ? (g.below ? 'below' : 'above') : ''); }
+  if(G) G.innerHTML = gapText(g);
   if(M) M.textContent = msg;
   if(B) B.disabled = p == null;
 }
-
 async function compress(file){
   const url = URL.createObjectURL(file);
   try{
@@ -696,44 +812,43 @@ async function compress(file){
     return c.toDataURL('image/jpeg', 0.6);
   } finally { URL.revokeObjectURL(url); }
 }
-
 async function saveBranch(){
   readStage();
   const d = S.draft;
-  if(!Object.keys(d.cats).length){ toast('سجل فئة واحدة على الأقل'); return false; }
+  if(!Object.keys(d.cats).length){ toast(t('needOne')); return false; }
   try{ checkCats(d.cats); }catch(e){ toast(e.message); return false; }
-  const b = branchById(d.branch);
   const item = {branch:d.branch, round:d.round, cats:clone(d.cats)};
   S.busy = true;
   try{
     await pushOne(item);
     store.del(dKey());
-    S.draft = {branch:d.branch, round:d.round, cats:clone(readingAt(d.branch, d.round).cats), open:null};
-    const done = readingAt(d.branch, d.round).complete;
-    toast(done ? 'تم الحفظ — الفرع مكتمل' : 'تم الحفظ — باقي فئات لم تسجل');
+    S.draft = {branch:d.branch, round:d.round, cats:clone(readingAt(d.branch, d.round).cats), open:null, editing:d.editing};
+    toast(readingAt(d.branch, d.round).complete ? t('savedComplete') : t('savedPartial'));
   }catch(e){
     if(e.code === 'network'){
       const q = queue().filter(x => !(x.branch === item.branch && x.round === item.round)); q.push(item); setQueue(q);
       applyLocal(item.branch, item.round, item.cats, {pending:true});
       store.del(dKey());
-      S.draft = {branch:d.branch, round:d.round, cats:clone(item.cats), open:null};
-      toast('اتحفظ على الجهاز، وهيترفع لوحده لما النت يرجع', 3500);
+      S.draft = {branch:d.branch, round:d.round, cats:clone(item.cats), open:null, editing:d.editing};
+      toast(t('savedLocal'), 3500);
     } else { toast(e.message, 4000); S.busy = false; render(); return false; }
   }
   S.busy = false; render(); return true;
 }
 function shareText(bid, round, cats){
-  const b = branchById(bid);
-  const rd = readingAt(bid, round);
-  let t = `📊 قراءة نسب المساحات\nالمحافظة: ${GOVS[b.gov]}\nالفرع: ${b.name}\nالمسؤول: ${userName(b.sup_id)}\nالقراءة رقم: ${round}\nالتاريخ: ${fmtDate(rd ? rd.updated_at : Date.now())}\n\n`;
-  CATS.forEach(({k,n}) => { const c = cats[k];
-    if(!c) t += `${n}: لم تسجل\n`;
-    else if(c.na) t += `${n}: غير متوفرة في الفرع\n`;
-    else t += `${n}: الكلية ${fmtN(c.t)} | الفعلية ${fmtN(c.a)} | ${fmtP(catPct(c))}\n`;
+  const b = branchById(bid), rd = readingAt(bid, round);
+  let s = `${t('shTitle')}\n${t('shGov')}: ${govName(b.gov)}\n${t('shBranch')}: ${b.name}\n${t('shSup')}: ${userName(b.sup_id)}\n${t('shRound')}: ${round}\n${t('shDate')}: ${fmtDate(rd ? rd.updated_at : Date.now())}\n\n`;
+  CAT_KEYS.forEach(k => { const c = cats[k];
+    if(!c) s += `${catName(k)}: ${t('notRec')}\n`;
+    else if(c.na) s += `${catName(k)}: ${t('na')}\n`;
+    else { const g = catGap(k, c);
+      s += `${catName(k)}: ${t('shTot')} ${fmtN(c.t)} | ${t('shAct')} ${fmtN(c.a)} | ${fmtP(catPct(c))}`;
+      if(g) s += g.below ? ` 🔴 (${t('shTarget')} ${fmtT(g.target)}, ${t('shShort')} ${g.pts.toFixed(2)} / ${fmtN(g.shelf)})` : ` 🟢`;
+      s += '\n'; }
   });
-  t += `\nالنسبة الإجمالية: ${fmtP(totalPct(cats))}`;
-  if(S.user.role === 'sup' || S.user.id !== b.sup_id) t += `\nأرسلها: ${S.user.name}`;
-  return t;
+  s += `\n${t('shOverall')}: ${fmtP(totalPct(cats))}`;
+  if(S.user.id !== b.sup_id) s += `\n${t('shSentBy')}: ${S.user.name}`;
+  return s;
 }
 async function share(){
   const d = S.draft, b = branchById(d.branch);
@@ -745,25 +860,24 @@ async function share(){
   document.body.appendChild(a); a.click(); a.remove();
 }
 
-/* ---------- المديرين ---------- */
+/* ---------- Managers ---------- */
 function scopeBranches(includeInactive){
   return S.data.branches.filter(b => (includeInactive || b.active)
     && (S.f.gov === 'all' || b.gov === S.f.gov) && (S.f.sup === 'all' || b.sup_id === S.f.sup));
 }
 function supsInScope(){
-  return S.data.users.filter(u => u.role === 'sup' && (S.f.gov === 'all' || u.gov === S.f.gov)
-    && S.data.branches.some(b => b.sup_id === u.id));
+  return S.data.users.filter(u => u.role === 'sup' && (S.f.gov === 'all' || u.gov === S.f.gov) && S.data.branches.some(b => b.sup_id === u.id));
 }
 function renderManager(){
-  const govs = S.user.role === 'gov' ? [S.user.gov] : Object.keys(GOVS);
+  const govs = S.user.role === 'gov' ? [S.user.gov] : GOV_KEYS;
   if(S.user.role === 'gov') S.f.gov = S.user.gov;
-  const tabs = [['dash','المتابعة'],['branches','الفروع'],...(isAdmin() ? [['admin','الإدارة']] : [])];
+  const tabs = [['dash',t('tabDash')],['branches',t('tabBranches')],...(isAdmin() ? [['admin',t('tabAdmin')]] : [])];
   return `
     <div class="card">
       <div class="row">
-        ${govs.length > 1 ? `<div class="field grow"><label class="lbl" for="fGov">المحافظة</label><select id="fGov" data-in="fGov"><option value="all">كل المحافظات</option>${govs.map(g => `<option value="${g}" ${S.f.gov===g?'selected':''}>${GOVS[g]}</option>`).join('')}</select></div>` : ''}
-        <div class="field grow"><label class="lbl" for="fSup">المسؤول</label><select id="fSup" data-in="fSup"><option value="all">كل المسؤولين</option>${supsInScope().map(u => `<option value="${u.id}" ${S.f.sup===u.id?'selected':''}>${esc(u.name)}</option>`).join('')}</select></div>
-        <div class="field"><span class="lbl">&nbsp;</span><button class="btn primary" data-act="excel">استخراج إكسيل</button></div>
+        ${govs.length > 1 ? `<div class="field grow"><label class="lbl" for="fGov">${t('gov')}</label><select id="fGov" data-in="fGov"><option value="all">${t('allGovs')}</option>${govs.map(g => `<option value="${g}" ${S.f.gov===g?'selected':''}>${govName(g)}</option>`).join('')}</select></div>` : ''}
+        <div class="field grow"><label class="lbl" for="fSup">${t('supervisor')}</label><select id="fSup" data-in="fSup"><option value="all">${t('allSups')}</option>${supsInScope().map(u => `<option value="${u.id}" ${S.f.sup===u.id?'selected':''}>${esc(u.name)}</option>`).join('')}</select></div>
+        <div class="field"><span class="lbl">&nbsp;</span><button class="btn primary" data-act="excel">${t('exportX')}</button></div>
       </div>
       <div class="tabs">${tabs.map(([k,n]) => `<button class="tab ${S.tab===k?'on':''}" data-act="tab" data-v="${k}">${n}</button>`).join('')}</div>
     </div>
@@ -774,228 +888,244 @@ function latestPair(bid){
   return {cur: rs[rs.length-1] || null, prev: rs[rs.length-2] || null};
 }
 function renderDash(){
-  const br = scopeBranches();
+  const br = scopeBranches(), useT = hasTargets();
+  const isRed = (cur, prev) => { if(!cur) return false;
+    if(useT){ const g = totalGap(cur.cats); return !!(g && g.below); }
+    return !!(prev && totalPct(cur.cats) < totalPct(prev.cats)); };
   const sups = supsInScope().filter(u => S.f.sup === 'all' || u.id === S.f.sup);
   const rows = sups.map(u => {
-    const mine = br.filter(b => b.sup_id === u.id);
-    const R = roundFor(u.id);
+    const mine = br.filter(b => b.sup_id === u.id), R = roundFor(u.id);
     const done = mine.filter(b => { const r = readingAt(b.id, R); return r && r.complete; }).length;
-    let t=0,a=0, down=0;
-    mine.forEach(b => { const {cur, prev} = latestPair(b.id); if(cur){ CATS.forEach(({k}) => { const c = cur.cats[k]; if(c && !c.na){ t+=+c.t; a+=+c.a; } }); }
-      if(cur && prev && totalPct(cur.cats) < totalPct(prev.cats)) down++; });
-    return {u, R, total:mine.length, done, avg: t ? a/t : null, down};
+    let tt=0, a=0, red=0;
+    mine.forEach(b => { const {cur, prev} = latestPair(b.id);
+      if(cur) CAT_KEYS.forEach(k => { const c = cur.cats[k]; if(c && !c.na){ tt+=+c.t; a+=+c.a; } });
+      if(isRed(cur, prev)) red++; });
+    return {u, R, total:mine.length, done, avg: tt ? a/tt : null, red};
   });
   const T = rows.reduce((s,r) => s + r.total, 0), D = rows.reduce((s,r) => s + r.done, 0);
-  // متوسط كل فئة: آخر قراءة مقابل اللي قبلها
-  const catAgg = CATS.map(({k,n}) => {
+  const catAgg = CAT_KEYS.map(k => {
     let ct=0,ca=0,pt=0,pa=0;
     br.forEach(b => { const {cur, prev} = latestPair(b.id);
       const c = cur && cur.cats[k]; if(c && !c.na){ ct+=+c.t; ca+=+c.a; }
       const p = prev && prev.cats[k]; if(p && !p.na){ pt+=+p.t; pa+=+p.a; } });
-    return {n, cur: ct ? ca/ct : null, prev: pt ? pa/pt : null};
+    const target = targets()[k] ?? null;
+    return {k, cur: ct ? ca/ct : null, prev: pt ? pa/pt : null, target, shelf: target != null && ct ? target*ct - ca : null};
   });
-  const reds = br.map(b => ({b, ...latestPair(b.id)})).filter(x => x.cur && x.prev && totalPct(x.cur.cats) < totalPct(x.prev.cats))
-    .map(x => ({...x, c: totalPct(x.cur.cats), p: totalPct(x.prev.cats)})).sort((a,b) => (a.c-a.p) - (b.c-b.p));
+  const reds = br.map(b => ({b, ...latestPair(b.id)})).filter(x => isRed(x.cur, x.prev)).map(x => {
+    const c = totalPct(x.cur.cats), g = totalGap(x.cur.cats);
+    return {...x, c, p: x.prev ? totalPct(x.prev.cats) : null, g};
+  }).sort((a,b) => useT ? (b.g.pts - a.g.pts) : ((a.c-a.p) - (b.c-b.p)));
   return `
     <div class="card">
-      <h2>الإنجاز في القراءة الحالية</h2>
+      <h2>${t('progressTitle')}</h2>
       <div class="kpis">
-        <div class="kpi"><div class="k">الفروع المسجلة</div><div class="v">${D} / ${T}</div><div class="bar"><i style="width:${T?Math.round(D/T*100):0}%"></i></div></div>
-        <div class="kpi"><div class="k">نسبة الإنجاز</div><div class="v">${T ? Math.round(D/T*100) : 0}%</div><div class="s">${T-D} فرع متبقي</div></div>
-        <div class="kpi"><div class="k">فروع نسبتها نزلت</div><div class="v" style="color:var(--bad)">${reds.length}</div><div class="s">مقارنة بالقراءة السابقة</div></div>
+        <div class="kpi"><div class="k">${t('kRecorded')}</div><div class="v">${D} / ${T}</div><div class="bar"><i style="width:${T?Math.round(D/T*100):0}%"></i></div></div>
+        <div class="kpi"><div class="k">${t('kRate')}</div><div class="v">${T ? Math.round(D/T*100) : 0}%</div><div class="s">${t('kLeft',{n:T-D})}</div></div>
+        <div class="kpi"><div class="k">${useT ? t('kBelow') : t('kDrop')}</div><div class="v" style="color:var(--bad)">${reds.length}</div><div class="s">${useT ? t('kBelowSub') : t('kDropSub')}</div></div>
       </div>
       <div class="tw"><table>
-        <thead><tr><th class="l">المسؤول</th><th class="l">المحافظة</th><th>القراءة</th><th>تم / الإجمالي</th><th>الإنجاز</th><th>متوسط آخر قراءة</th><th>نزلت</th></tr></thead>
-        <tbody>${rows.map(r => `<tr><td class="l">${esc(r.u.name)}</td><td class="l">${GOVS[r.u.gov]||''}</td><td>${r.R}</td><td>${r.done} / ${r.total}</td>
-          <td><div class="bar"><i style="width:${r.total?Math.round(r.done/r.total*100):0}%"></i></div></td><td>${fmtP(r.avg)}</td><td>${r.down || '—'}</td></tr>`).join('')}</tbody>
+        <thead><tr><th class="l">${t('thSup')}</th><th class="l">${t('thGov')}</th><th>${t('thRound')}</th><th>${t('thDoneTotal')}</th><th>${t('thProgress')}</th><th>${t('thAvg')}</th><th>${t('thBelow')}</th></tr></thead>
+        <tbody>${rows.map(r => `<tr><td class="l">${esc(r.u.name)}</td><td class="l">${govName(r.u.gov)}</td><td>${r.R}</td><td>${r.done} / ${r.total}</td>
+          <td><div class="bar"><i style="width:${r.total?Math.round(r.done/r.total*100):0}%"></i></div></td><td>${fmtP(r.avg)}</td><td>${r.red || '—'}</td></tr>`).join('')}</tbody>
       </table></div>
     </div>
     <div class="card">
-      <h2>متوسط كل فئة</h2>
-      <div class="muted">آخر قراءة مكتملة لكل فرع مقابل القراءة اللي قبلها (مرجح بالمساحة)</div>
-      <div class="kpis">${catAgg.map(c => { const cls = c.cur!=null && c.prev!=null ? (c.cur >= c.prev ? 'up' : 'down') : '';
-        return `<div class="kpi"><div class="k">${c.n}</div><div class="v">${fmtP(c.cur)}</div><div class="s"><span class="${cls}" style="padding:0 4px;border-radius:4px">السابقة: ${fmtP(c.prev)}</span></div></div>`; }).join('')}</div>
+      <h2>${t('catAvgTitle')}</h2>
+      <div class="muted">${t('catAvgNote')}</div>
+      <div class="kpis">${catAgg.map(c => { const cls = shareClass(c.cur, c.target, c.prev);
+        return `<div class="kpi"><div class="k">${catName(c.k)}</div><div class="v"><span class="pill ${cls}">${fmtP(c.cur)}</span></div>
+          <div class="s">${c.target != null ? t('targetIs',{v:fmtT(c.target)}) + (c.shelf > 0 ? ' · ' + t('gap',{p:((c.target-c.cur)*100).toFixed(2), s:fmtN(c.shelf)}) : '') : t('noTarget')}</div>
+          <div class="s">${t('prevLbl',{v:fmtP(c.prev)})}</div></div>`; }).join('')}</div>
     </div>
     <div class="card">
-      <h2>الفروع اللي نسبتها نزلت</h2>
-      ${reds.length ? `<div class="tw"><table><thead><tr><th class="l">الفرع</th><th class="l">المسؤول</th><th>السابقة</th><th>الحالية</th><th>الفرق</th></tr></thead><tbody>
-        ${reds.map(x => `<tr><td class="l"><a href="#" data-act="goto" data-id="${x.b.id}">${esc(x.b.name)}</a></td><td class="l">${esc(userName(x.b.sup_id))}</td><td>${fmtP(x.p)}</td><td class="down">${fmtP(x.c)}</td><td class="down">${((x.c-x.p)*100).toFixed(2)}</td></tr>`).join('')}
-      </tbody></table></div>` : `<div class="muted">مفيش فروع نسبتها نزلت.</div>`}
+      <h2>${useT ? t('redTitleT') : t('redTitleP')}</h2>
+      ${reds.length ? `<div class="tw"><table><thead><tr><th class="l">${t('thBranch')}</th><th class="l">${t('thSup')}</th>
+        ${useT ? `<th>${t('thTarget')}</th><th>${t('thCur')}</th><th>${t('thDiff')}</th><th>${t('thGapShelf')}</th>` : `<th>${t('thPrev')}</th><th>${t('thCur')}</th><th>${t('thDiff')}</th>`}</tr></thead><tbody>
+        ${reds.map(x => `<tr><td class="l"><a href="#" data-act="goto" data-id="${x.b.id}">${esc(x.b.name)}</a></td><td class="l">${esc(userName(x.b.sup_id))}</td>
+          ${useT ? `<td>${fmtT(x.g.target)}</td><td class="down">${fmtP(x.c)}</td><td class="down">−${x.g.pts.toFixed(2)}</td><td class="down">${fmtN(x.g.shelf)}</td>`
+                 : `<td>${fmtP(x.p)}</td><td class="down">${fmtP(x.c)}</td><td class="down">${((x.c-x.p)*100).toFixed(2)}</td>`}</tr>`).join('')}
+      </tbody></table></div>` : `<div class="muted">${t('noneRed')}</div>`}
     </div>`;
 }
 function renderMgrBranches(){
-  const br = scopeBranches();
-  const st = br.map(b => ({b, s: branchStatus(b)}));
+  const st = scopeBranches().map(b => ({b, s: branchStatus(b)}));
   const done = st.filter(x => x.s === 'done').length;
   return `<div class="card">
-      <div class="row" style="justify-content:space-between"><h2>الفروع</h2><span class="muted">الحالة حسب القراءة الحالية لكل مسؤول</span></div>
+      <div class="row between"><h2>${t('branchesTitle')}</h2><span class="muted">${t('statusNote')}</span></div>
       ${statChips(st.length, done)}
-      ${branchPicker(st)}
+      ${branchSelect(st)}
     </div>
     ${S.sel ? renderHistory() : ''}
-    ${S.sel && S.draft && S.editRound != null && S.draft.editing ? renderEditor() : ''}`;
+    ${S.sel && S.draft && S.draft.editing ? renderEditor() : ''}`;
 }
 function renderHistory(){
   const b = branchById(S.sel); if(!b) return '';
-  const rs = readingsOf(b.id);
-  const R = roundFor(b.sup_id);
-  const cell = (c, p) => {
+  const rs = readingsOf(b.id), R = roundFor(b.sup_id);
+  const cell = (k, c, p) => {
     if(!c) return `<td>—</td>`;
-    if(c.na) return `<td class="nacell">غير متوفر</td>`;
-    const v = catPct(c), pv = p && !p.na ? catPct(p) : null;
-    const cls = pv == null ? '' : v >= pv ? 'up' : 'down';
-    const ph = c.photo ? ` <a href="#" data-act="viewphoto" data-src="${esc(API.photoUrl(c.photo))}" title="صورة الرف">📷</a>` : '';
-    return `<td class="${cls}">${fmtP(v)}${ph}</td>`;
+    if(c.na) return `<td class="nacell">${t('naShort')}</td>`;
+    const v = catPct(c), pv = p && !p.na ? catPct(p) : null, tg = targets()[k] ?? null;
+    const trend = pv == null ? '' : `<span class="trend">${v >= pv ? '▲' : '▼'}</span>`;
+    const g = catGap(k, c);
+    return `<td class="${shareClass(v, tg, pv)}">${fmtP(v)}${trend} ${photoBtn(c, catName(k))}${g && g.below ? `<small>−${g.pts.toFixed(2)} · ${fmtN(g.shelf)}</small>` : ''}</td>`;
   };
+  const photos = [];
+  rs.slice().reverse().forEach(r => CAT_KEYS.forEach(k => { const c = r.cats[k]; if(c && c.photo) photos.push({src:API.photoUrl(c.photo), cap:t('photoCap',{c:catName(k), r:r.round}), d:fmtDate(r.updated_at)}); }));
   return `<div class="card" id="history">
-    <div class="row" style="justify-content:space-between">
-      <div><h2>${esc(b.name)}</h2><div class="muted">${GOVS[b.gov]} · ${esc(userName(b.sup_id))}${b.active ? '' : ' · موقوف'}</div></div>
-      <button class="btn sm ghost" data-act="close">إغلاق</button>
+    <div class="row between">
+      <div><h2>${esc(b.name)}</h2><div class="muted">${govName(b.gov)} · ${esc(userName(b.sup_id))}${b.active ? '' : ' · ' + t('inactive')}</div></div>
+      <button class="btn sm ghost" data-act="close">${t('close')}</button>
     </div>
     ${rs.length ? `<div class="tw"><table>
-      <thead><tr><th>القراءة</th><th>التاريخ</th>${CATS.map(c => `<th>${c.n}</th>`).join('')}<th>الإجمالي</th>${canEdit()?'<th></th>':''}</tr></thead>
+      <thead><tr><th>${t('thRound')}</th><th>${t('shDate')}</th>${CAT_KEYS.map(k => `<th>${catName(k)}${targets()[k] != null ? `<br><span style="font-weight:400">${t('thTarget')} ${fmtT(targets()[k])}</span>` : ''}</th>`).join('')}<th>${t('overall')}</th>${canEdit()?'<th></th>':''}</tr></thead>
       <tbody>${rs.map((r,i) => { const p = i ? rs[i-1] : null;
-        const tv = totalPct(r.cats), tp = p ? totalPct(p.cats) : null;
-        const tc = tp == null || tv == null ? '' : tv >= tp ? 'up' : 'down';
-        return `<tr><td>${r.round}${r.complete ? '' : ' <span class="muted">(ناقص)</span>'}</td><td>${fmtDate(r.created_at)}</td>
-          ${CATS.map(({k}) => cell(r.cats[k], p && p.cats[k])).join('')}<td class="${tc}">${fmtP(tv)}</td>
-          ${canEdit() ? `<td><button class="btn sm" data-act="mgredit" data-r="${r.round}">تعديل</button>${isAdmin() ? ` <button class="btn sm danger ${S.armed==='del'+r.id?'armed':''}" data-act="delread" data-id="${r.id}">${S.armed==='del'+r.id?'تأكيد':'حذف'}</button>` : ''}</td>` : ''}</tr>`; }).join('')}
-      </tbody></table></div>` : `<div class="muted">لا توجد قراءات لهذا الفرع بعد.</div>`}
-    ${canEdit() && !readingAt(b.id, R) && b.active ? `<button class="btn" data-act="mgredit" data-r="${R}">إدخال القراءة الحالية (${R})</button>` : ''}
+        const tv = totalPct(r.cats), tp = p ? totalPct(p.cats) : null, tg = totalGap(r.cats);
+        return `<tr><td>${r.round}${r.complete ? '' : ` <span class="muted">${t('partialTag')}</span>`}</td><td>${fmtDate(r.created_at)}</td>
+          ${CAT_KEYS.map(k => cell(k, r.cats[k], p && p.cats[k])).join('')}
+          <td class="${shareClass(tv, tg ? tg.target : null, tp)}">${fmtP(tv)}${tg && tg.below ? `<small>−${tg.pts.toFixed(2)} · ${fmtN(tg.shelf)}</small>` : ''}</td>
+          ${canEdit() ? `<td><button class="btn sm" data-act="mgredit" data-r="${r.round}">${t('edit')}</button>${isAdmin() ? ` <button class="btn sm danger ${S.armed==='del'+r.id?'armed':''}" data-act="delread" data-id="${r.id}">${S.armed==='del'+r.id?t('confirm'):t('del')}</button>` : ''}</td>` : ''}</tr>`; }).join('')}
+      </tbody></table></div>` : `<div class="muted">${t('noReadings')}</div>`}
+    ${canEdit() && !readingAt(b.id, R) && b.active ? `<button class="btn" data-act="mgredit" data-r="${R}">${t('enterCur',{n:R})}</button>` : ''}
+    <h2>${t('photosTitle')}</h2>
+    ${photos.length ? `<div class="gallery">${photos.map(ph => `<figure><img src="${esc(ph.src)}" alt="${esc(ph.cap)}" loading="lazy" data-act="viewphoto" data-src="${esc(ph.src)}" data-cap="${esc(ph.cap + ' · ' + ph.d)}"><figcaption>${esc(ph.cap)} · ${ph.d}</figcaption></figure>`).join('')}</div>`
+      : `<div class="muted">${t('noPhotos')}</div>`}
   </div>`;
 }
 
-/* ---------- الإدارة (أحمد يسن) ---------- */
+/* ---------- Admin (Ahmed Yassen) ---------- */
 function renderAdmin(){
-  const users = S.data.users;
-  const sups = users.filter(u => u.role === 'sup');
-  const q = (S.aq || '').trim();
+  const users = S.data.users, sups = users.filter(u => u.role === 'sup'), q = (S.aq || '').trim();
   const br = S.data.branches.filter(b => (S.f.gov === 'all' || b.gov === S.f.gov) && (S.f.sup === 'all' || b.sup_id === S.f.sup) && (!q || b.name.includes(q)));
-  const govSel = (id, v, allowNone) => `<select id="${id}">${allowNone?`<option value="">—</option>`:''}${Object.entries(GOVS).map(([k,n]) => `<option value="${k}" ${v===k?'selected':''}>${n}</option>`).join('')}</select>`;
-  const supSel = (id, v) => `<select id="${id}">${sups.map(u => `<option value="${u.id}" ${v===u.id?'selected':''}>${esc(u.name)} (${GOVS[u.gov]||''})</option>`).join('')}</select>`;
+  const govSel = (id, v, allowNone) => `<select id="${id}">${allowNone?`<option value="">—</option>`:''}${GOV_KEYS.map(k => `<option value="${k}" ${v===k?'selected':''}>${govName(k)}</option>`).join('')}</select>`;
+  const supSel = (id, v) => `<select id="${id}">${sups.map(u => `<option value="${u.id}" ${v===u.id?'selected':''}>${esc(u.name)} (${govName(u.gov)})</option>`).join('')}</select>`;
+  const roleSel = (id, v) => `<select id="${id}">${Object.keys(I18N.en.roles).map(k => `<option value="${k}" ${v===k?'selected':''}>${roleName(k)}</option>`).join('')}</select>`;
+  const tg = targets();
   return `
     <div class="card">
-      <h2>المسؤولين والرموز السرية</h2>
-      <div class="tw"><table>
-        <thead><tr><th class="l">الاسم</th><th>الوظيفة</th><th>المحافظة</th><th>نشط</th><th>رمز جديد</th><th></th></tr></thead>
-        <tbody>${users.map(u => `<tr>
-          <td class="l"><input type="text" id="un-${u.id}" value="${esc(u.name)}" style="min-width:140px"></td>
-          <td><select id="ur-${u.id}">${Object.entries(ROLES).map(([k,n]) => `<option value="${k}" ${u.role===k?'selected':''}>${n}</option>`).join('')}</select></td>
-          <td>${govSel('ug-'+u.id, u.gov, true)}</td>
-          <td><input type="checkbox" id="ua-${u.id}" ${u.active!==false?'checked':''} ${u.id===S.user.id?'disabled':''}></td>
-          <td><input type="tel" inputmode="numeric" maxlength="8" id="up-${u.id}" placeholder="بدون تغيير" style="width:110px"></td>
-          <td><button class="btn sm primary" data-act="usave" data-id="${u.id}">حفظ</button></td></tr>`).join('')}
-          <tr><td class="l"><input type="text" id="un-new" placeholder="اسم مسؤول جديد" style="min-width:140px"></td>
-          <td><select id="ur-new">${Object.entries(ROLES).map(([k,n]) => `<option value="${k}">${n}</option>`).join('')}</select></td>
-          <td>${govSel('ug-new', '', true)}</td><td><input type="checkbox" id="ua-new" checked></td>
-          <td><input type="tel" inputmode="numeric" maxlength="8" id="up-new" placeholder="رمز (4-8 أرقام)" style="width:110px"></td>
-          <td><button class="btn sm" data-act="usave" data-id="new">إضافة</button></td></tr>
-        </tbody></table></div>
-      <div class="muted">الرمز الجديد بيتحفظ مشفر، ومحدش يقدر يشوفه بعد الحفظ. اكتبه وابعته للمسؤول بنفسك.</div>
+      <h2>${t('targetsTitle')}</h2>
+      <div class="muted">${t('targetsNote')}</div>
+      <div class="kpis">${CAT_KEYS.map(k => `<div class="field"><label class="lbl" for="tg-${k}">${catName(k)} (%)</label>
+        <input type="number" inputmode="decimal" step="any" min="0" max="100" id="tg-${k}" value="${tg[k] != null ? +(tg[k]*100).toFixed(2) : ''}" placeholder="—"></div>`).join('')}</div>
+      <div><button class="btn primary" data-act="tsave">${t('saveTargets')}</button></div>
     </div>
     <div class="card">
-      <h2>الفروع</h2>
+      <h2>${t('usersTitle')}</h2>
+      <div class="tw"><table>
+        <thead><tr><th class="l">${t('thName')}</th><th class="l">${t('thTitle')}</th><th>${t('thRole')}</th><th>${t('gov')}</th><th>${t('thActive')}</th><th>${t('thNewPin')}</th><th></th></tr></thead>
+        <tbody>${users.map(u => `<tr>
+          <td class="l"><input type="text" id="un-${u.id}" value="${esc(u.name)}" style="min-width:140px"></td>
+          <td class="l"><input type="text" id="ut-${u.id}" value="${esc(u.title||'')}" placeholder="${esc(roleName(u.role))}" style="min-width:130px"></td>
+          <td>${roleSel('ur-'+u.id, u.role)}</td>
+          <td>${govSel('ug-'+u.id, u.gov, true)}</td>
+          <td><input type="checkbox" id="ua-${u.id}" ${u.active!==false?'checked':''} ${u.id===S.user.id?'disabled':''}></td>
+          <td><input type="tel" inputmode="numeric" maxlength="8" id="up-${u.id}" placeholder="${t('keep')}" style="width:110px"></td>
+          <td><button class="btn sm primary" data-act="usave" data-id="${u.id}">${t('save')}</button></td></tr>`).join('')}
+          <tr><td class="l"><input type="text" id="un-new" placeholder="${t('newUserName')}" style="min-width:140px"></td>
+          <td class="l"><input type="text" id="ut-new" placeholder="${t('titlePh')}" style="min-width:130px"></td>
+          <td>${roleSel('ur-new','sup')}</td><td>${govSel('ug-new', '', true)}</td><td><input type="checkbox" id="ua-new" checked></td>
+          <td><input type="tel" inputmode="numeric" maxlength="8" id="up-new" placeholder="${t('pinHint')}" style="width:110px"></td>
+          <td><button class="btn sm" data-act="usave" data-id="new">${t('add')}</button></td></tr>
+        </tbody></table></div>
+      <div class="muted">${t('pinNote')}</div>
+    </div>
+    <div class="card">
+      <h2>${t('branchesTitle')}</h2>
       <div class="row">
-        <div class="field grow"><label class="lbl" for="nbName">فرع جديد</label><input type="text" id="nbName" placeholder="اسم الفرع"></div>
-        <div class="field"><label class="lbl" for="nbGov">المحافظة</label>${govSel('nbGov', S.f.gov !== 'all' ? S.f.gov : 'Cairo')}</div>
-        <div class="field"><label class="lbl" for="nbSup">المسؤول</label>${supSel('nbSup', S.f.sup !== 'all' ? S.f.sup : '')}</div>
-        <div class="field"><span class="lbl">&nbsp;</span><button class="btn primary" data-act="bsave" data-id="new">إضافة</button></div>
+        <div class="field grow"><label class="lbl" for="nbName">${t('newBranch')}</label><input type="text" id="nbName" placeholder="${t('branchName')}"></div>
+        <div class="field"><label class="lbl" for="nbGov">${t('gov')}</label>${govSel('nbGov', S.f.gov !== 'all' ? S.f.gov : 'Cairo')}</div>
+        <div class="field"><label class="lbl" for="nbSup">${t('supervisor')}</label>${supSel('nbSup', S.f.sup !== 'all' ? S.f.sup : '')}</div>
+        <div class="field"><span class="lbl">&nbsp;</span><button class="btn primary" data-act="bsave" data-id="new">${t('add')}</button></div>
       </div>
-      <input type="text" id="aq" data-in="aq" placeholder="ابحث في الفروع (${br.length})" value="${esc(S.aq || '')}">
+      <input type="text" id="aq" data-in="aq" placeholder="${t('searchBranches',{n:br.length})}" value="${esc(S.aq || '')}">
       <div class="tw" style="max-height:480px"><table>
-        <thead><tr><th class="l">الفرع</th><th>المحافظة</th><th>المسؤول</th><th>نشط</th><th></th></tr></thead>
+        <thead><tr><th class="l">${t('thBranch')}</th><th>${t('gov')}</th><th>${t('supervisor')}</th><th>${t('thActive')}</th><th></th></tr></thead>
         <tbody>${br.slice(0, 150).map(b => `<tr>
           <td class="l"><input type="text" id="bn-${b.id}" value="${esc(b.name)}" style="min-width:180px"></td>
           <td>${govSel('bg-'+b.id, b.gov)}</td><td>${supSel('bs-'+b.id, b.sup_id)}</td>
           <td><input type="checkbox" id="ba-${b.id}" ${b.active?'checked':''}></td>
-          <td><button class="btn sm primary" data-act="bsave" data-id="${b.id}">حفظ</button></td></tr>`).join('')}</tbody>
+          <td><button class="btn sm primary" data-act="bsave" data-id="${b.id}">${t('save')}</button></td></tr>`).join('')}</tbody>
       </table></div>
-      ${br.length > 150 ? `<div class="muted">بيظهر أول 150 فرع. استخدم البحث أو الفلاتر.</div>` : ''}
-      <div class="muted">إيقاف الفرع بيخرجه من الفروع المتبقية من غير ما قراءاته القديمة تتمسح.</div>
+      ${br.length > 150 ? `<div class="muted">${t('first150')}</div>` : ''}
+      <div class="muted">${t('deactNote')}</div>
     </div>`;
 }
 
-/* ===================== الإكسيل ===================== */
+/* ===================== Excel ===================== */
 function loadExcelJS(){
   if(window.ExcelJS) return Promise.resolve();
   return new Promise((res, rej) => { const s = document.createElement('script');
-    s.src = 'https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js'; s.onload = res; s.onerror = () => rej(mkErr('تعذر تحميل مكتبة الإكسيل — تأكد من الإنترنت')); document.head.appendChild(s); });
+    s.src = 'https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js'; s.onload = res; s.onerror = () => rej(mkErr('libFail')); document.head.appendChild(s); });
 }
 const PAL = [['0F766E','D5ECE9'],['6D28D9','E7DFFB'],['B45309','F9E7D0'],['1D4ED8','DBE5FB'],['BE185D','F9DCE8'],['4D7C0F','E4EFD2']];
 async function exportExcel(){
-  toast('جاري تجهيز الإكسيل…');
-  await loadExcelJS();
+  toast(t('exporting'));
+  try{ await loadExcelJS(); }catch(e){ throw new Error(t('libFail')); }
   const sup = S.user.role === 'sup';
   const br = sup ? S.data.branches.filter(b => b.active) : scopeBranches(true).filter(b => b.active || readingsOf(b.id).length);
-  let rounds;
-  if(sup) rounds = [roundFor(S.user.id)];
-  else rounds = [...new Set(br.flatMap(b => readingsOf(b.id).map(r => r.round)))].sort((a,b) => a-b);
+  let rounds = sup ? [roundFor(S.user.id)] : [...new Set(br.flatMap(b => readingsOf(b.id).map(r => r.round)))].sort((a,b) => a-b);
   if(!rounds.length) rounds = [1];
-  const wb = new ExcelJS.Workbook(); wb.creator = 'حاسبة نسب المساحات';
-  const ws = wb.addWorksheet('القراءات', {views:[{rightToLeft:true, state:'frozen', xSplit:3, ySplit:3}]});
-  const BL = 16, base = 4;
-  const thin = {style:'thin', color:{argb:'FFBFC8C6'}};
-  const border = {top:thin, left:thin, bottom:thin, right:thin};
+  const rtl = LANG === 'ar', FONT = 'Calibri';
+  const wb = new ExcelJS.Workbook(); wb.creator = t('appTitle');
+  const ws = wb.addWorksheet(t('sheetReadings'), {views:[{rightToLeft:rtl, state:'frozen', xSplit:3, ySplit:3}]});
+  const BL = 15, base = 4;
+  const thin = {style:'thin', color:{argb:'FFBFC8C6'}}, border = {top:thin, left:thin, bottom:thin, right:thin};
   const fill = c => ({type:'pattern', pattern:'solid', fgColor:{argb:'FF'+c}});
-  const hdr = (cell, v, bg, fg='FFFFFF', bold=true) => { cell.value = v; cell.fill = fill(bg); cell.font = {bold, color:{argb:'FF'+fg}, name:'Arial', size:11}; cell.alignment = {horizontal:'center', vertical:'middle', wrapText:true}; cell.border = border; };
-  // الأعمدة الثابتة
-  [['المحافظة',12],['الفرع',32],['المسؤول',16]].forEach(([n,w],i) => { ws.mergeCells(1,i+1,3,i+1); hdr(ws.getCell(1,i+1), n, '334155'); ws.getColumn(i+1).width = w; });
+  const hdr = (cell, v, bg, fg='FFFFFF', bold=true) => { cell.value = v; cell.fill = fill(bg); cell.font = {bold, color:{argb:'FF'+fg}, name:FONT, size:11}; cell.alignment = {horizontal:'center', vertical:'middle', wrapText:true}; cell.border = border; };
+  [[t('thGov'),13],[t('thBranch'),34],[t('thSup'),18]].forEach(([n,w],i) => { ws.mergeCells(1,i+1,3,i+1); hdr(ws.getCell(1,i+1), n, '334155'); ws.getColumn(i+1).width = w; });
   rounds.forEach((r, ri) => {
-    const [dark, light] = PAL[ri % PAL.length];
-    const c0 = base + ri*BL;
+    const [dark, light] = PAL[ri % PAL.length], c0 = base + ri*BL;
     const dates = br.map(b => readingAt(b.id, r)).filter(Boolean).map(x => x.created_at).sort();
-    const range = dates.length ? `من ${fmtDate(dates[0])} إلى ${fmtDate(dates[dates.length-1])}` : 'لم تبدأ';
-    ws.mergeCells(1, c0, 1, c0+BL-1); hdr(ws.getCell(1, c0), `القراءة ${r}   |   ${range}`, dark);
-    ws.mergeCells(2, c0, 3, c0); hdr(ws.getCell(2, c0), 'التاريخ', light, '1F2937'); ws.getColumn(c0).width = 12;
-    [...CATS.map(c => c.n), 'الإجمالي'].forEach((n, ci) => {
-      const cc = c0 + 1 + ci*3;
+    const range = dates.length ? t('fromTo',{a:fmtDate(dates[0]), b:fmtDate(dates[dates.length-1])}) : t('notStarted');
+    ws.mergeCells(1, c0, 1, c0+BL-1); hdr(ws.getCell(1, c0), `${t('readingHdr',{n:r})}   |   ${range}`, dark);
+    [...CAT_KEYS.map(k => catName(k) + (targets()[k] != null ? ` (${t('thTarget')} ${fmtT(targets()[k])})` : '')), t('overall')].forEach((n, ci) => {
+      const cc = c0 + ci*3;
       ws.mergeCells(2, cc, 2, cc+2); hdr(ws.getCell(2, cc), n, light, '1F2937');
-      ['الكلية','الفعلية','النسبة'].forEach((s, si) => { hdr(ws.getCell(3, cc+si), s, light, '1F2937', false); ws.getColumn(cc+si).width = si === 2 ? 10 : 9; });
+      [t('thTotal'),t('thActual'),t('thPct')].forEach((s, si) => { hdr(ws.getCell(3, cc+si), s, light, '1F2937', false); ws.getColumn(cc+si).width = si === 2 ? 11 : 9; });
     });
   });
-  ws.getRow(1).height = 24; ws.getRow(2).height = 20;
+  ws.getRow(1).height = 24; ws.getRow(2).height = 30;
   const GOOD = ['C6EFCE','006100'], BAD = ['FFC7CE','9C0006'], NA = ['E5E7EB','6B7280'];
   br.forEach((b, i) => {
     const row = ws.getRow(4 + i);
-    row.getCell(1).value = GOVS[b.gov]; row.getCell(2).value = b.name + (b.active ? '' : ' (موقوف)'); row.getCell(3).value = userName(b.sup_id);
-    [1,2,3].forEach(c => { row.getCell(c).border = border; row.getCell(c).alignment = {vertical:'middle'}; });
+    row.getCell(1).value = govName(b.gov); row.getCell(2).value = b.name + (b.active ? '' : t('inactiveSfx')); row.getCell(3).value = userName(b.sup_id);
+    [1,2,3].forEach(c => { const x = row.getCell(c); x.border = border; x.alignment = {vertical:'middle'}; x.font = {name:FONT, size:11}; });
     const hist = readingsOf(b.id);
     rounds.forEach((r, ri) => {
-      const c0 = base + ri*BL;
-      const rd = readingAt(b.id, r);
+      const c0 = base + ri*BL, rd = readingAt(b.id, r);
       const prev = sup ? null : (hist.filter(x => x.round < r).pop() || null);
-      for(let k = 0; k < BL; k++) row.getCell(c0+k).border = border;
+      for(let k = 0; k < BL; k++){ const x = row.getCell(c0+k); x.border = border; x.font = {name:FONT, size:11}; }
       if(!rd) return;
-      row.getCell(c0).value = fmtDate(rd.created_at);
-      const put = (cc, c, pc) => {
+      const put = (cc, c, prevPct, target, gap) => {
         if(!c) return;
-        if(c.na){ ws.mergeCells(row.number, cc, row.number, cc+2); const x = row.getCell(cc); x.value = 'غير متوفر'; x.fill = fill(NA[0]); x.font = {color:{argb:'FF'+NA[1]}}; x.alignment = {horizontal:'center'}; return; }
+        if(c.na){ ws.mergeCells(row.number, cc, row.number, cc+2); const x = row.getCell(cc); x.value = t('naShort'); x.fill = fill(NA[0]); x.font = {name:FONT, color:{argb:'FF'+NA[1]}}; x.alignment = {horizontal:'center'}; return; }
         row.getCell(cc).value = +c.t; row.getCell(cc+1).value = +c.a;
         const p = row.getCell(cc+2); p.value = c.t > 0 ? c.a / c.t : null; p.numFmt = '0.00%';
-        if(pc != null && p.value != null){ const [bg, fg] = p.value >= pc ? GOOD : BAD; p.fill = fill(bg); p.font = {bold:true, color:{argb:'FF'+fg}}; }
+        const cls = shareClass(p.value, target, prevPct);
+        if(cls){ const [bg, fg] = cls === 'up' ? GOOD : BAD; p.fill = fill(bg); p.font = {name:FONT, bold:true, color:{argb:'FF'+fg}}; }
+        if(gap && gap.below) p.note = t('gapNote',{p:gap.pts.toFixed(2), s:fmtN(gap.shelf), t:fmtT(gap.target)});
       };
-      CATS.forEach(({k}, ci) => { const pc = prev && prev.cats[k] && !prev.cats[k].na ? catPct(prev.cats[k]) : null; put(c0+1+ci*3, rd.cats[k], pc); });
-      let t=0,a=0; CATS.forEach(({k}) => { const c = rd.cats[k]; if(c && !c.na){ t+=+c.t; a+=+c.a; } });
-      if(t > 0) put(c0+13, {t, a}, prev ? totalPct(prev.cats) : null);
-      [c0+13, c0+14, c0+15].forEach(c => { const x = row.getCell(c); x.font = {...(x.font||{}), bold:true}; });
+      CAT_KEYS.forEach((k, ci) => { const c = rd.cats[k];
+        const pc = prev && prev.cats[k] && !prev.cats[k].na ? catPct(prev.cats[k]) : null;
+        put(c0 + ci*3, c, pc, targets()[k] ?? null, c && !c.na ? catGap(k, c) : null); });
+      let tt=0, a=0; CAT_KEYS.forEach(k => { const c = rd.cats[k]; if(c && !c.na){ tt+=+c.t; a+=+c.a; } });
+      const tg = totalGap(rd.cats);
+      if(tt > 0) put(c0+12, {t:tt, a}, prev ? totalPct(prev.cats) : null, tg ? tg.target : null, tg);
+      [c0+12, c0+13, c0+14].forEach(c => { const x = row.getCell(c); x.font = {...(x.font||{}), bold:true}; });
     });
   });
-  // الملخص
-  const ws2 = wb.addWorksheet('الملخص', {views:[{rightToLeft:true}]});
-  const head = ['المسؤول','المحافظة','القراءة الحالية','إجمالي الفروع','اتسجلت','المتبقي','نسبة الإنجاز'];
-  head.forEach((h,i) => { hdr(ws2.getCell(1,i+1), h, '334155'); ws2.getColumn(i+1).width = i ? 15 : 22; });
+  const ws2 = wb.addWorksheet(t('sheetSummary'), {views:[{rightToLeft:rtl}]});
+  t('sumHead').forEach((h,i) => { hdr(ws2.getCell(1,i+1), h, '334155'); ws2.getColumn(i+1).width = i ? 16 : 22; });
   const supIds = sup ? [S.user.id] : [...new Set(br.map(b => b.sup_id))];
   supIds.forEach((id, i) => {
     const mine = br.filter(b => b.sup_id === id && b.active), R = roundFor(id);
     const done = mine.filter(b => { const r = readingAt(b.id, R); return r && r.complete; }).length;
-    const u = S.data.users.find(x => x.id === id) || S.user;
-    const vals = [userName(id), GOVS[u.gov] || '', R, mine.length, done, mine.length - done, mine.length ? done/mine.length : 0];
-    vals.forEach((v,c) => { const x = ws2.getCell(i+2, c+1); x.value = v; x.border = border; if(c === 6) x.numFmt = '0%'; });
+    const u = findUser(id) || S.user;
+    [userName(id), govName(u.gov), R, mine.length, done, mine.length - done, mine.length ? done/mine.length : 0].forEach((v,c) => {
+      const x = ws2.getCell(i+2, c+1); x.value = v; x.border = border; x.font = {name:FONT, size:11}; if(c === 6) x.numFmt = '0%'; });
   });
   const buf = await wb.xlsx.writeBuffer();
-  const scope = sup ? S.user.name : (S.f.sup !== 'all' ? userName(S.f.sup) : S.f.gov !== 'all' ? GOVS[S.f.gov] : 'كل المحافظات');
-  const name = `نسب_المساحات_${scope}_${cairoDate(Date.now())}.xlsx`.replace(/\s+/g,'_');
-  await saveFile(name, new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+  const scope = sup ? S.user.name : (S.f.sup !== 'all' ? userName(S.f.sup) : S.f.gov !== 'all' ? govName(S.f.gov) : t('allGovs'));
+  await saveFile(`${t('appTitle')}_${scope}_${cairoDate(Date.now())}.xlsx`.replace(/\s+/g,'_'), new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
 }
 async function saveFile(name, blob){
   try{
@@ -1004,31 +1134,28 @@ async function saveFile(name, blob){
   }catch(e){ if(e && e.code === 'declined') return; }
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-  toast('تم تنزيل ملف الإكسيل');
+  toast(t('exported'));
 }
 
-/* ===================== الأحداث ===================== */
+/* ===================== Events ===================== */
+function openViewer(src, cap){ const im = document.getElementById('pvImg'); im.src = src; im.alt = cap || ''; document.getElementById('pvCap').textContent = cap || ''; document.getElementById('pv').hidden = false; }
 document.addEventListener('click', async ev => {
   const el = ev.target.closest('[data-act]'); if(!el) return;
   const act = el.dataset.act;
   if(el.tagName === 'A' && el.getAttribute('href') === '#') ev.preventDefault();
-  if(act !== 'clear' && act !== 'delread' && S.armed){ S.armed = null; }
+  if(act !== 'clear' && act !== 'delread' && S.armed) S.armed = null;
   try{
   switch(act){
+    case 'lang': LANG = LANG === 'en' ? 'ar' : 'en'; store.set('lang', LANG); return S.user ? render() : renderLogin();
     case 'login': return doLogin();
     case 'logout': return logout();
-    case 'refresh': try{ await loadData(); await syncQueue(); toast('تم التحديث'); }catch(e){ toast(e.message); } return;
+    case 'refresh': try{ await loadData(); await syncQueue(); toast(t('refreshed')); }catch(e){ toast(e.message); } return;
     case 'sync': return syncQueue();
     case 'filter': S.filter = el.dataset.v; return render();
-    case 'open': {
-      const id = +el.dataset.id;
-      if(isMgr()){ S.sel = id; S.draft = null; S.editRound = null; render(); setTimeout(() => document.getElementById('history')?.scrollIntoView({behavior:'smooth'}), 30); return; }
-      return openBranch(id);
-    }
-    case 'goto': S.tab = 'branches'; S.sel = +el.dataset.id; S.draft = null; render(); setTimeout(() => document.getElementById('history')?.scrollIntoView({behavior:'smooth'}), 30); return;
+    case 'goto': S.tab = 'branches'; S.sel = +el.dataset.id; S.draft = null; render(); scrollTo('history'); return;
     case 'close': return closeBranch();
     case 'editprev': return openBranch(S.sel, +el.dataset.r);
-    case 'mgredit': openBranch(S.sel, +el.dataset.r); S.draft.editing = true; saveDraft(); return render();
+    case 'mgredit': openBranch(S.sel, +el.dataset.r); S.draft.editing = true; saveDraft(); render(); scrollTo('editor'); return;
     case 'cat': {
       readStage();
       const k = el.dataset.k, c = S.draft.cats[k];
@@ -1040,56 +1167,62 @@ document.addEventListener('click', async ev => {
       readStage();
       const o = S.draft.open; let v;
       if(o.na) v = {na:true};
-      else { const t = num(o.t), a = num(o.a);
-        if(t == null || a == null || t <= 0 || a < 0){ toast('اكتب المساحة الكلية والفعلية'); return; }
-        if(a > t){ toast(ERRS.actual_gt_total); return; }
-        v = {t, a}; }
+      else { const tt = num(o.t), a = num(o.a);
+        if(tt == null || a == null || tt <= 0 || a < 0){ toast(t('enterBoth')); return; }
+        if(a > tt){ toast(t('err_agt')); return; }
+        v = {t:tt, a}; }
       if(o.photo) v.photo = o.photo; if(o.photoData) v.photoData = o.photoData;
-      S.draft.cats[o.k] = v; S.draft.open = null;
-      // افتح الفئة الجاية اللي لسه ما اتسجلتش
-      saveDraft(); return render();
+      S.draft.cats[o.k] = v; S.draft.open = null; saveDraft(); return render();
     }
     case 'rmphoto': delete S.draft.open.photo; delete S.draft.open.photoData; saveDraft(); return render();
-    case 'viewphoto': { const pv = document.getElementById('pv'); document.getElementById('pvImg').src = el.dataset.src; pv.hidden = false; return; }
+    case 'viewphoto': return openViewer(el.dataset.src, el.dataset.cap);
     case 'save': if(!S.busy) await saveBranch(); return;
     case 'share': return share();
     case 'clear':
       if(S.armed !== 'clear'){ S.armed = 'clear'; render(); setTimeout(() => { if(S.armed === 'clear'){ S.armed = null; render(); } }, 3500); return; }
-      S.armed = null; S.draft.cats = {}; S.draft.open = null; saveDraft(); toast('اتمسحت البيانات من الشاشة. سجل الفئات من جديد واضغط حفظ.'); return render();
-    case 'excel': try{ await exportExcel(); }catch(e){ toast(e.message || 'تعذر استخراج الإكسيل', 4000); } return;
+      S.armed = null; S.draft.cats = {}; S.draft.open = null; saveDraft(); toast(t('cleared')); return render();
+    case 'excel': try{ await exportExcel(); }catch(e){ toast(e.message || t('excelFail'), 4000); } return;
     case 'tab': S.tab = el.dataset.v; S.sel = null; S.draft = null; return render();
     case 'delread': {
       const id = el.dataset.id;
       if(S.armed !== 'del'+id){ S.armed = 'del'+id; return render(); }
       S.armed = null; await API.deleteReading(S.sess.id, S.sess.pin, isNaN(+id) ? id : +id);
-      S.data.readings = S.data.readings.filter(r => String(r.id) !== id); cacheData(); toast('تم حذف القراءة'); return render();
+      S.data.readings = S.data.readings.filter(r => String(r.id) !== id); cacheData(); toast(t('deleted')); return render();
+    }
+    case 'tsave': {
+      const tg = {};
+      for(const k of CAT_KEYS){ const v = num(document.getElementById('tg-'+k).value);
+        if(v != null){ if(v < 0 || v > 100){ toast(I18N[LANG].errs.invalid); return; } tg[k] = Math.round(v*100)/10000; } }
+      await API.saveTargets(S.sess.id, S.sess.pin, tg); S.data.targets = tg; cacheData(); toast(t('targetsSaved')); return render();
     }
     case 'usave': {
       const id = el.dataset.id, g = x => document.getElementById(x + '-' + id);
-      const u = {id: id === 'new' ? 'u' + Date.now().toString(36) : id, name: g('un').value, role: g('ur').value, gov: g('ug').value || null, active: g('ua').checked, pin: g('up').value.trim() || null};
-      if(!u.name.trim()){ toast('اكتب الاسم'); return; }
-      if(u.role !== 'admin' && u.role !== 'analyst' && !u.gov){ toast('اختار المحافظة'); return; }
+      const u = {id: id === 'new' ? 'u' + Date.now().toString(36) : id, name: g('un').value, title: g('ut').value.trim(), role: g('ur').value, gov: g('ug').value || null, active: g('ua').checked, pin: g('up').value.trim() || null};
+      if(!u.name.trim()){ toast(t('needNameT')); return; }
+      if(u.role !== 'admin' && u.role !== 'analyst' && !u.gov){ toast(t('needGov')); return; }
       await API.saveUser(S.sess.id, S.sess.pin, u);
       if(u.id === S.sess.id && u.pin){ S.sess.pin = u.pin; store.set('sess', S.sess); }
-      await loadData(); toast(u.pin ? 'اتحفظ والرمز الجديد شغال' : 'اتحفظ'); return;
+      await loadData(); toast(u.pin ? t('pinSaved') : t('savedT')); return;
     }
     case 'bsave': {
       const id = el.dataset.id;
       const b = id === 'new' ? {id:null, name:document.getElementById('nbName').value, gov:document.getElementById('nbGov').value, sup_id:document.getElementById('nbSup').value, active:true}
         : {id:+id, name:document.getElementById('bn-'+id).value, gov:document.getElementById('bg-'+id).value, sup_id:document.getElementById('bs-'+id).value, active:document.getElementById('ba-'+id).checked};
-      if(!b.name.trim()){ toast('اكتب اسم الفرع'); return; }
+      if(!b.name.trim()){ toast(t('needBranchName')); return; }
       await API.saveBranch(S.sess.id, S.sess.pin, b);
-      await loadData(); toast(id === 'new' ? 'تمت إضافة الفرع' : 'اتحفظ'); return;
+      await loadData(); toast(id === 'new' ? t('branchAdded') : t('savedT')); return;
     }
   }
-  }catch(e){ toast(e.message || 'حصل خطأ', 4000); }
+  }catch(e){ toast(e.message || I18N[LANG].errs.generic, 4000); }
 });
 document.getElementById('pv').addEventListener('click', () => document.getElementById('pv').hidden = true);
-
+document.addEventListener('keydown', ev => {
+  if(ev.key === 'Enter' && ev.target.id === 'lgPin') doLogin();
+  if(ev.key === 'Escape') document.getElementById('pv').hidden = true;
+});
 document.addEventListener('input', ev => {
   const el = ev.target, k = el.dataset && el.dataset.in; if(!k) return;
   if(k === 'lgPin'){ S.login.pin = el.value; return; }
-  if(k === 'bq'){ S.q = el.value; const pos = el.selectionStart; render(); const n = document.getElementById('bq'); n.focus(); n.setSelectionRange(pos,pos); return; }
   if(k === 'aq'){ S.aq = el.value; const pos = el.selectionStart; render(); const n = document.getElementById('aq'); n.focus(); n.setSelectionRange(pos,pos); return; }
   if(k === 'stT' || k === 'stA'){ readStage(); saveDraft(); updateStageLive(); return; }
 });
@@ -1097,16 +1230,20 @@ document.addEventListener('change', async ev => {
   const el = ev.target, k = el.dataset && el.dataset.in; if(!k) return;
   if(k === 'lgGov'){ S.login.gov = el.value; S.login.uid = ''; S.login.err = ''; return renderLogin(); }
   if(k === 'lgUser'){ S.login.uid = el.value; S.login.err = ''; return; }
-  if(k === 'fGov'){ S.f.gov = el.value; S.f.sup = 'all'; S.sel = null; return render(); }
-  if(k === 'fSup'){ S.f.sup = el.value; S.sel = null; return render(); }
+  if(k === 'fGov'){ S.f.gov = el.value; S.f.sup = 'all'; S.sel = null; S.draft = null; return render(); }
+  if(k === 'fSup'){ S.f.sup = el.value; S.sel = null; S.draft = null; return render(); }
+  if(k === 'bsel'){
+    const id = +el.value; if(!id) return;
+    if(isMgr()){ S.sel = id; S.draft = null; S.editRound = null; render(); scrollTo('history'); return; }
+    return openBranch(id);
+  }
   if(k === 'stNa'){ readStage(); S.draft.open.na = el.checked; saveDraft(); return render(); }
   if(k === 'stPhoto' && el.files && el.files[0]){
     readStage();
-    try{ S.draft.open.photoData = await compress(el.files[0]); delete S.draft.open.photo; saveDraft(); }catch(e){ toast('تعذر قراءة الصورة'); }
+    try{ S.draft.open.photoData = await compress(el.files[0]); delete S.draft.open.photo; saveDraft(); }catch(e){ toast(I18N[LANG].errs.photo); }
     return render();
   }
 });
-document.addEventListener('keydown', ev => { if(ev.key === 'Enter' && ev.target.id === 'lgPin') doLogin(); });
 window.addEventListener('online', () => { S.online = true; render(); syncQueue(); });
 window.addEventListener('offline', () => { S.online = false; render(); });
 setInterval(() => { if(S.user && queue().length && navigator.onLine) syncQueue(); }, 30000);
