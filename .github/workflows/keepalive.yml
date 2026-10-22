@@ -1,0 +1,47 @@
+# يكلم قاعدة البيانات كل 3 أيام علشان Supabase المجاني ما يقفش من قلة الاستخدام.
+# ولو المستودع ما اتعدلش من 50 يوم، بيسجل تاريخ في ملف صغير علشان GitHub ما يوقفش الفحص نفسه.
+name: Keep database awake
+
+on:
+  schedule:
+    - cron: "17 6 */3 * *"   # كل 3 أيام الساعة 9:17 الصبح بتوقيت القاهرة
+  workflow_dispatch:          # زرار تشغيل يدوي للتجربة
+
+permissions:
+  contents: write
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase
+        env:
+          URL: https://gbhdjpmuoutrudkgbvjf.supabase.co
+          KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdiaGRqcG11b3V0cnVka2didmpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2NDg0OTYsImV4cCI6MjEwODIyNDQ5Nn0.irVaX41yUNktoueDNkQILzzq-rV81Q2BBqsUmSUqrw8
+        run: |
+          for i in 1 2 3; do
+            code=$(curl -s -o /tmp/out.json -w "%{http_code}" -X POST "$URL/rest/v1/rpc/list_users" \
+              -H "apikey: $KEY" -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" -d '{}')
+            echo "Attempt $i: HTTP $code"
+            if [ "$code" = "200" ]; then echo "Database is awake"; exit 0; fi
+            sleep 20
+          done
+          echo "::error::Database did not answer. Open Supabase > shelf-tool and press Restore if it is paused."
+          exit 1
+
+      - uses: actions/checkout@v4
+
+      - name: Keep this schedule active
+        run: |
+          last=$(git log -1 --format=%ct)
+          now=$(date +%s)
+          if [ $(( (now - last) / 86400 )) -ge 50 ]; then
+            date -u +"%Y-%m-%dT%H:%M:%SZ" > .keepalive
+            git config user.name "keepalive-bot"
+            git config user.email "keepalive-bot@users.noreply.github.com"
+            git add .keepalive
+            git commit -m "Keep schedule active"
+            git push
+          else
+            echo "Repository active recently, nothing to commit"
+          fi
