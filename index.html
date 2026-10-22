@@ -114,6 +114,10 @@ td small{display:block;font-size:11.5px;font-weight:500}
 .gallery figure{margin:0;display:flex;flex-direction:column;gap:4px}
 .gallery img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;border:1px solid var(--line);cursor:zoom-in}
 .gallery figcaption{font-size:12px;color:var(--muted)}
+tr.dirty td{background:var(--warn-soft)}
+.savebar{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:20;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;
+  background:var(--surface);border:1px solid var(--accent);border-radius:var(--r);padding:10px 14px;box-shadow:0 6px 24px rgba(0,0,0,.15)}
+.savebar b{font-weight:600}
 .photo-btn{border:none;background:none;cursor:pointer;padding:0 2px;font-size:13px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;z-index:50;max-width:calc(100% - 32px);text-align:center}
 .photo-view{position:fixed;inset:0;background:rgba(0,0,0,.88);display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;z-index:60;padding:20px;color:#fff}
@@ -183,6 +187,7 @@ en:{
   deactNote:'Turning a branch off removes it from the remaining list without deleting its old readings.', branchAdded:'Branch added', needBranchName:'Enter the branch name',
   targetsTitle:'Target shares', targetsNote:'A share below its target shows red with the gap; equal or above shows green. Leave a category empty to compare with the previous reading instead.',
   saveTargets:'Save targets', targetsSaved:'Targets saved',
+  unsaved:'{n} unsaved changes', noUnsaved:'No unsaved changes', saveAll:'Save all changes', discard:'Discard changes', savedN:'Saved {n} changes', discarded:'Changes discarded', saving:'Saving…', editHint:'Edit as many rows as you need, then tap Save all changes once.',
   sheetReadings:'Readings', sheetSummary:'Summary', notStarted:'Not started', fromTo:'{a} to {b}', inactiveSfx:' (inactive)',
   exporting:'Preparing Excel…', exported:'Excel file downloaded', excelFail:'Could not export Excel', libFail:'Could not load the Excel library. Check the internet connection.',
   sumHead:['Supervisor','Governorate','Current reading','Total branches','Recorded','Remaining','Completion'],
@@ -241,6 +246,7 @@ ar:{
   deactNote:'إيقاف الفرع بيخرجه من الفروع المتبقية من غير ما قراءاته القديمة تتمسح.', branchAdded:'تمت إضافة الفرع', needBranchName:'اكتب اسم الفرع',
   targetsTitle:'النسب المستهدفة', targetsNote:'النسبة الأقل من المستهدف تظهر بالأحمر مع الناقص، والمساوية أو الأعلى بالأخضر. لو سبت فئة فاضية، هتتقارن بالقراءة السابقة بدلًا من المستهدف.',
   saveTargets:'حفظ المستهدف', targetsSaved:'اتحفظ المستهدف',
+  unsaved:'{n} تعديل لم يُحفظ', noUnsaved:'لا توجد تعديلات', saveAll:'حفظ كل التعديلات', discard:'إلغاء التعديلات', savedN:'تم حفظ {n} تعديل', discarded:'اتلغت التعديلات', saving:'جاري الحفظ…', editHint:'عدّل كل اللي محتاجه في الصفوف، وبعدين دوس حفظ كل التعديلات مرة واحدة.',
   sheetReadings:'القراءات', sheetSummary:'الملخص', notStarted:'لم تبدأ', fromTo:'من {a} إلى {b}', inactiveSfx:' (موقوف)',
   exporting:'جاري تجهيز الإكسيل…', exported:'تم تنزيل ملف الإكسيل', excelFail:'تعذر استخراج الإكسيل', libFail:'تعذر تحميل مكتبة الإكسيل. تأكد من الإنترنت.',
   sumHead:['المسؤول','المحافظة','القراءة الحالية','إجمالي الفروع','اتسجلت','المتبقي','نسبة الإنجاز'],
@@ -457,7 +463,7 @@ const S = {
   sess: store.get('sess'), user: null, data: null, users: store.get('users-cache') || [],
   login: {gov:'', uid:'', pin:'', err:''},
   filter: 'all', sel: null, editRound: null, draft: null,
-  tab: 'dash', f: {gov:'all', sup:'all'}, aq: '',
+  tab: 'dash', f: {gov:'all', sup:'all'}, aq: '', edits: {},
   armed: null, online: navigator.onLine, busy: false, waLink: null
 };
 const qKey = () => 'queue:' + S.user.id;
@@ -592,7 +598,7 @@ function restoreDraft(){
 }
 function logout(){
   if(S.user) store.del('data:' + S.user.id);
-  store.del('sess'); S.sess = null; S.user = null; S.data = null; S.sel = null; S.draft = null;
+  store.del('sess'); S.sess = null; S.user = null; S.data = null; S.sel = null; S.draft = null; S.edits = {};
   S.login = {gov:'', uid:'', pin:'', err:''};
   boot();
 }
@@ -993,40 +999,74 @@ function renderHistory(){
 }
 
 /* ---------- Admin (Ahmed Yassen) ---------- */
+// Edits are kept in S.edits until "Save all changes", so re-renders (search, filters) never lose them.
+function origOf(row){
+  const [kind, id] = row.split(':');
+  if(kind === 'u'){ const u = S.data.users.find(x => x.id === id) || {}; return {name:u.name||'', title:u.title||'', role:u.role||'sup', gov:u.gov||'', active:u.active !== false, pin:''}; }
+  if(kind === 'b'){ const b = branchById(+id) || {}; return {name:b.name||'', gov:b.gov||'', sup_id:b.sup_id||'', active:!!b.active}; }
+  const tg = targets(), o = {}; CAT_KEYS.forEach(k => o[k] = tg[k] != null ? String(+(tg[k]*100).toFixed(2)) : ''); return o;
+}
+const edVal = (row, f) => { const e = S.edits[row]; return e && f in e ? e[f] : origOf(row)[f]; };
+const editCount = () => Object.values(S.edits).reduce((n, e) => n + Object.keys(e).length, 0);
+function setEdit(row, f, v){
+  const o = origOf(row)[f];
+  const same = typeof o === 'boolean' ? o === v : String(o ?? '') === String(v ?? '');
+  if(same){ if(S.edits[row]){ delete S.edits[row][f]; if(!Object.keys(S.edits[row]).length) delete S.edits[row]; } }
+  else (S.edits[row] = S.edits[row] || {})[f] = v;
+  document.querySelectorAll(`tr[data-row="${row}"]`).forEach(tr => tr.classList.toggle('dirty', !!S.edits[row]));
+  updateSaveBar();
+}
+// update the bar in place: replacing it would swallow a click that started while an input was losing focus
+function updateSaveBar(){
+  const bar = document.getElementById('savebar'); if(!bar) return;
+  const n = editCount();
+  bar.querySelector('b').textContent = n ? t('unsaved',{n}) : t('noUnsaved');
+  bar.querySelector('[data-act=discard]').disabled = !n;
+  const sv = bar.querySelector('[data-act=saveall]'); sv.disabled = !n || S.busy; sv.textContent = S.busy ? t('saving') : t('saveAll');
+}
+function saveBar(){
+  const n = editCount();
+  return `<div class="savebar" id="savebar"><b>${n ? t('unsaved',{n}) : t('noUnsaved')}</b>
+    <div class="row"><button class="btn sm ghost" data-act="discard" ${n?'':'disabled'}>${t('discard')}</button>
+    <button class="btn primary" data-act="saveall" ${n && !S.busy?'':'disabled'}>${S.busy ? t('saving') : t('saveAll')}</button></div></div>`;
+}
 function renderAdmin(){
   const users = S.data.users, sups = users.filter(u => u.role === 'sup'), q = (S.aq || '').trim();
   const br = S.data.branches.filter(b => (S.f.gov === 'all' || b.gov === S.f.gov) && (S.f.sup === 'all' || b.sup_id === S.f.sup) && (!q || b.name.includes(q)));
-  const govSel = (id, v, allowNone) => `<select id="${id}">${allowNone?`<option value="">—</option>`:''}${GOV_KEYS.map(k => `<option value="${k}" ${v===k?'selected':''}>${govName(k)}</option>`).join('')}</select>`;
-  const supSel = (id, v) => `<select id="${id}">${sups.map(u => `<option value="${u.id}" ${v===u.id?'selected':''}>${esc(u.name)} (${govName(u.gov)})</option>`).join('')}</select>`;
-  const roleSel = (id, v) => `<select id="${id}">${Object.keys(I18N.en.roles).map(k => `<option value="${k}" ${v===k?'selected':''}>${roleName(k)}</option>`).join('')}</select>`;
-  const tg = targets();
+  const ed = (row, f) => `data-ed="${row}|${f}"`;
+  const govSel = (id, v, allowNone, attr='') => `<select id="${id}" ${attr}>${allowNone?`<option value="">—</option>`:''}${GOV_KEYS.map(k => `<option value="${k}" ${v===k?'selected':''}>${govName(k)}</option>`).join('')}</select>`;
+  const supSel = (id, v, attr='') => `<select id="${id}" ${attr}>${sups.map(u => `<option value="${u.id}" ${v===u.id?'selected':''}>${esc(u.name)} (${govName(u.gov)})</option>`).join('')}</select>`;
+  const roleSel = (id, v, attr='') => `<select id="${id}" ${attr}>${Object.keys(I18N.en.roles).map(k => `<option value="${k}" ${v===k?'selected':''}>${roleName(k)}</option>`).join('')}</select>`;
+  const dirty = row => S.edits[row] ? 'dirty' : '';
   return `
+    <div class="banner info">${t('editHint')}</div>
     <div class="card">
       <h2>${t('targetsTitle')}</h2>
       <div class="muted">${t('targetsNote')}</div>
       <div class="kpis">${CAT_KEYS.map(k => `<div class="field"><label class="lbl" for="tg-${k}">${catName(k)} (%)</label>
-        <input type="number" inputmode="decimal" step="any" min="0" max="100" id="tg-${k}" value="${tg[k] != null ? +(tg[k]*100).toFixed(2) : ''}" placeholder="—"></div>`).join('')}</div>
-      <div><button class="btn primary" data-act="tsave">${t('saveTargets')}</button></div>
+        <input type="number" inputmode="decimal" step="any" min="0" max="100" id="tg-${k}" ${ed('t:all',k)} value="${esc(edVal('t:all',k))}" placeholder="—"></div>`).join('')}</div>
     </div>
     <div class="card">
       <h2>${t('usersTitle')}</h2>
       <div class="tw"><table>
-        <thead><tr><th class="l">${t('thName')}</th><th class="l">${t('thTitle')}</th><th>${t('thRole')}</th><th>${t('gov')}</th><th>${t('thActive')}</th><th>${t('thNewPin')}</th><th></th></tr></thead>
-        <tbody>${users.map(u => `<tr>
-          <td class="l"><input type="text" id="un-${u.id}" value="${esc(u.name)}" style="min-width:140px"></td>
-          <td class="l"><input type="text" id="ut-${u.id}" value="${esc(u.title||'')}" placeholder="${esc(roleName(u.role))}" style="min-width:130px"></td>
-          <td>${roleSel('ur-'+u.id, u.role)}</td>
-          <td>${govSel('ug-'+u.id, u.gov, true)}</td>
-          <td><input type="checkbox" id="ua-${u.id}" ${u.active!==false?'checked':''} ${u.id===S.user.id?'disabled':''}></td>
-          <td><input type="tel" inputmode="numeric" maxlength="8" id="up-${u.id}" placeholder="${t('keep')}" style="width:110px"></td>
-          <td><button class="btn sm primary" data-act="usave" data-id="${u.id}">${t('save')}</button></td></tr>`).join('')}
-          <tr><td class="l"><input type="text" id="un-new" placeholder="${t('newUserName')}" style="min-width:140px"></td>
-          <td class="l"><input type="text" id="ut-new" placeholder="${t('titlePh')}" style="min-width:130px"></td>
-          <td>${roleSel('ur-new','sup')}</td><td>${govSel('ug-new', '', true)}</td><td><input type="checkbox" id="ua-new" checked></td>
-          <td><input type="tel" inputmode="numeric" maxlength="8" id="up-new" placeholder="${t('pinHint')}" style="width:110px"></td>
-          <td><button class="btn sm" data-act="usave" data-id="new">${t('add')}</button></td></tr>
+        <thead><tr><th class="l">${t('thName')}</th><th class="l">${t('thTitle')}</th><th>${t('thRole')}</th><th>${t('gov')}</th><th>${t('thActive')}</th><th>${t('thNewPin')}</th></tr></thead>
+        <tbody>${users.map(u => { const row = 'u:' + u.id; return `<tr data-row="${row}" class="${dirty(row)}">
+          <td class="l"><input type="text" id="un-${u.id}" ${ed(row,'name')} value="${esc(edVal(row,'name'))}" style="min-width:140px"></td>
+          <td class="l"><input type="text" id="ut-${u.id}" ${ed(row,'title')} value="${esc(edVal(row,'title'))}" placeholder="${esc(roleName(edVal(row,'role')))}" style="min-width:130px"></td>
+          <td>${roleSel('ur-'+u.id, edVal(row,'role'), ed(row,'role'))}</td>
+          <td>${govSel('ug-'+u.id, edVal(row,'gov'), true, ed(row,'gov'))}</td>
+          <td><input type="checkbox" id="ua-${u.id}" ${ed(row,'active')} ${edVal(row,'active')?'checked':''} ${u.id===S.user.id?'disabled':''}></td>
+          <td><input type="tel" inputmode="numeric" maxlength="8" id="up-${u.id}" ${ed(row,'pin')} value="${esc(edVal(row,'pin'))}" placeholder="${t('keep')}" style="width:110px"></td></tr>`; }).join('')}
         </tbody></table></div>
       <div class="muted">${t('pinNote')}</div>
+      <div class="row">
+        <div class="field grow"><label class="lbl" for="un-new">${t('newUserName')}</label><input type="text" id="un-new"></div>
+        <div class="field grow"><label class="lbl" for="ut-new">${t('thTitle')}</label><input type="text" id="ut-new" placeholder="${t('titlePh')}"></div>
+        <div class="field"><label class="lbl" for="ur-new">${t('thRole')}</label>${roleSel('ur-new','sup')}</div>
+        <div class="field"><label class="lbl" for="ug-new">${t('gov')}</label>${govSel('ug-new', '', true)}</div>
+        <div class="field"><label class="lbl" for="up-new">${t('pinHint')}</label><input type="tel" inputmode="numeric" maxlength="8" id="up-new" style="width:120px"></div>
+        <div class="field"><span class="lbl">&nbsp;</span><button class="btn" data-act="uadd">${t('add')}</button></div>
+      </div>
     </div>
     <div class="card">
       <h2>${t('branchesTitle')}</h2>
@@ -1034,20 +1074,53 @@ function renderAdmin(){
         <div class="field grow"><label class="lbl" for="nbName">${t('newBranch')}</label><input type="text" id="nbName" placeholder="${t('branchName')}"></div>
         <div class="field"><label class="lbl" for="nbGov">${t('gov')}</label>${govSel('nbGov', S.f.gov !== 'all' ? S.f.gov : 'Cairo')}</div>
         <div class="field"><label class="lbl" for="nbSup">${t('supervisor')}</label>${supSel('nbSup', S.f.sup !== 'all' ? S.f.sup : '')}</div>
-        <div class="field"><span class="lbl">&nbsp;</span><button class="btn primary" data-act="bsave" data-id="new">${t('add')}</button></div>
+        <div class="field"><span class="lbl">&nbsp;</span><button class="btn" data-act="badd">${t('add')}</button></div>
       </div>
       <input type="text" id="aq" data-in="aq" placeholder="${t('searchBranches',{n:br.length})}" value="${esc(S.aq || '')}">
       <div class="tw" style="max-height:480px"><table>
-        <thead><tr><th class="l">${t('thBranch')}</th><th>${t('gov')}</th><th>${t('supervisor')}</th><th>${t('thActive')}</th><th></th></tr></thead>
-        <tbody>${br.slice(0, 150).map(b => `<tr>
-          <td class="l"><input type="text" id="bn-${b.id}" value="${esc(b.name)}" style="min-width:180px"></td>
-          <td>${govSel('bg-'+b.id, b.gov)}</td><td>${supSel('bs-'+b.id, b.sup_id)}</td>
-          <td><input type="checkbox" id="ba-${b.id}" ${b.active?'checked':''}></td>
-          <td><button class="btn sm primary" data-act="bsave" data-id="${b.id}">${t('save')}</button></td></tr>`).join('')}</tbody>
+        <thead><tr><th class="l">${t('thBranch')}</th><th>${t('gov')}</th><th>${t('supervisor')}</th><th>${t('thActive')}</th></tr></thead>
+        <tbody>${br.slice(0, 150).map(b => { const row = 'b:' + b.id; return `<tr data-row="${row}" class="${dirty(row)}">
+          <td class="l"><input type="text" id="bn-${b.id}" ${ed(row,'name')} value="${esc(edVal(row,'name'))}" style="min-width:180px"></td>
+          <td>${govSel('bg-'+b.id, edVal(row,'gov'), false, ed(row,'gov'))}</td><td>${supSel('bs-'+b.id, edVal(row,'sup_id'), ed(row,'sup_id'))}</td>
+          <td><input type="checkbox" id="ba-${b.id}" ${ed(row,'active')} ${edVal(row,'active')?'checked':''}></td></tr>`; }).join('')}</tbody>
       </table></div>
       ${br.length > 150 ? `<div class="muted">${t('first150')}</div>` : ''}
       <div class="muted">${t('deactNote')}</div>
-    </div>`;
+    </div>
+    ${saveBar()}`;
+}
+async function saveAllEdits(){
+  const rows = Object.keys(S.edits);
+  // validate everything first, so nothing is half-saved because of a typo
+  const jobs = [];
+  for(const row of rows){
+    const [kind, id] = row.split(':'), v = {...origOf(row), ...S.edits[row]};
+    if(kind === 'u'){
+      if(!String(v.name).trim()) throw new Error(t('needNameT'));
+      if(v.role !== 'admin' && v.role !== 'analyst' && !v.gov) throw new Error(t('needGov') + ': ' + v.name);
+      const pin = String(v.pin || '').trim();
+      if(pin && !/^[0-9]{4,8}$/.test(pin)) throw mkErr('bad_new_pin');
+      jobs.push({row, n:Object.keys(S.edits[row]).length, run: () => API.saveUser(S.sess.id, S.sess.pin, {id, name:v.name, title:String(v.title).trim(), role:v.role, gov:v.gov || null, active:v.active, pin: pin || null}), pin, id});
+    } else if(kind === 'b'){
+      if(!String(v.name).trim()) throw new Error(t('needBranchName'));
+      jobs.push({row, n:Object.keys(S.edits[row]).length, run: () => API.saveBranch(S.sess.id, S.sess.pin, {id:+id, name:v.name, gov:v.gov, sup_id:v.sup_id, active:v.active})});
+    } else {
+      const tg = {};
+      for(const k of CAT_KEYS){ const x = num(v[k]); if(x != null){ if(x < 0 || x > 100) throw mkErr('invalid'); tg[k] = Math.round(x*100)/10000; } }
+      jobs.push({row, n:Object.keys(S.edits[row]).length, run: () => API.saveTargets(S.sess.id, S.sess.pin, tg)});
+    }
+  }
+  let saved = 0;
+  try{
+    for(const j of jobs){
+      await j.run();
+      if(j.pin && j.id === S.sess.id){ S.sess.pin = j.pin; store.set('sess', S.sess); }
+      saved += j.n; delete S.edits[j.row];
+    }
+  } finally {
+    await loadData().catch(() => {});
+  }
+  return saved;
 }
 
 /* ===================== Excel ===================== */
@@ -1189,28 +1262,28 @@ document.addEventListener('click', async ev => {
       S.armed = null; await API.deleteReading(S.sess.id, S.sess.pin, isNaN(+id) ? id : +id);
       S.data.readings = S.data.readings.filter(r => String(r.id) !== id); cacheData(); toast(t('deleted')); return render();
     }
-    case 'tsave': {
-      const tg = {};
-      for(const k of CAT_KEYS){ const v = num(document.getElementById('tg-'+k).value);
-        if(v != null){ if(v < 0 || v > 100){ toast(I18N[LANG].errs.invalid); return; } tg[k] = Math.round(v*100)/10000; } }
-      await API.saveTargets(S.sess.id, S.sess.pin, tg); S.data.targets = tg; cacheData(); toast(t('targetsSaved')); return render();
+    case 'saveall': {
+      if(S.busy || !editCount()) return;
+      S.busy = true; updateSaveBar();
+      try{ const n = await saveAllEdits(); toast(t('savedN',{n})); }
+      finally{ S.busy = false; render(); }
+      return;
     }
-    case 'usave': {
-      const id = el.dataset.id, g = x => document.getElementById(x + '-' + id);
-      const u = {id: id === 'new' ? 'u' + Date.now().toString(36) : id, name: g('un').value, title: g('ut').value.trim(), role: g('ur').value, gov: g('ug').value || null, active: g('ua').checked, pin: g('up').value.trim() || null};
+    case 'discard': S.edits = {}; toast(t('discarded')); return render();
+    case 'uadd': {
+      const g = x => document.getElementById(x + '-new');
+      const u = {id: 'u' + Date.now().toString(36), name: g('un').value, title: g('ut').value.trim(), role: g('ur').value, gov: g('ug').value || null, active: true, pin: g('up').value.trim() || null};
       if(!u.name.trim()){ toast(t('needNameT')); return; }
       if(u.role !== 'admin' && u.role !== 'analyst' && !u.gov){ toast(t('needGov')); return; }
+      if(!u.pin || !/^[0-9]{4,8}$/.test(u.pin)){ toast(I18N[LANG].errs.bad_new_pin); return; }
       await API.saveUser(S.sess.id, S.sess.pin, u);
-      if(u.id === S.sess.id && u.pin){ S.sess.pin = u.pin; store.set('sess', S.sess); }
-      await loadData(); toast(u.pin ? t('pinSaved') : t('savedT')); return;
+      await loadData(); toast(t('pinSaved')); return;
     }
-    case 'bsave': {
-      const id = el.dataset.id;
-      const b = id === 'new' ? {id:null, name:document.getElementById('nbName').value, gov:document.getElementById('nbGov').value, sup_id:document.getElementById('nbSup').value, active:true}
-        : {id:+id, name:document.getElementById('bn-'+id).value, gov:document.getElementById('bg-'+id).value, sup_id:document.getElementById('bs-'+id).value, active:document.getElementById('ba-'+id).checked};
+    case 'badd': {
+      const b = {id:null, name:document.getElementById('nbName').value, gov:document.getElementById('nbGov').value, sup_id:document.getElementById('nbSup').value, active:true};
       if(!b.name.trim()){ toast(t('needBranchName')); return; }
       await API.saveBranch(S.sess.id, S.sess.pin, b);
-      await loadData(); toast(id === 'new' ? t('branchAdded') : t('savedT')); return;
+      await loadData(); toast(t('branchAdded')); return;
     }
   }
   }catch(e){ toast(e.message || I18N[LANG].errs.generic, 4000); }
@@ -1220,13 +1293,19 @@ document.addEventListener('keydown', ev => {
   if(ev.key === 'Enter' && ev.target.id === 'lgPin') doLogin();
   if(ev.key === 'Escape') document.getElementById('pv').hidden = true;
 });
+function captureEdit(el){
+  const [row, f] = el.dataset.ed.split('|');
+  setEdit(row, f, el.type === 'checkbox' ? el.checked : el.value);
+}
 document.addEventListener('input', ev => {
+  if(ev.target.dataset && ev.target.dataset.ed){ captureEdit(ev.target); return; }
   const el = ev.target, k = el.dataset && el.dataset.in; if(!k) return;
   if(k === 'lgPin'){ S.login.pin = el.value; return; }
   if(k === 'aq'){ S.aq = el.value; const pos = el.selectionStart; render(); const n = document.getElementById('aq'); n.focus(); n.setSelectionRange(pos,pos); return; }
   if(k === 'stT' || k === 'stA'){ readStage(); saveDraft(); updateStageLive(); return; }
 });
 document.addEventListener('change', async ev => {
+  if(ev.target.dataset && ev.target.dataset.ed){ captureEdit(ev.target); return; }
   const el = ev.target, k = el.dataset && el.dataset.in; if(!k) return;
   if(k === 'lgGov'){ S.login.gov = el.value; S.login.uid = ''; S.login.err = ''; return renderLogin(); }
   if(k === 'lgUser'){ S.login.uid = el.value; S.login.err = ''; return; }
