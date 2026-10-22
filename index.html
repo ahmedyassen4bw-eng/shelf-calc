@@ -128,7 +128,13 @@ tr.dirty td{background:var(--warn-soft)}
 .photo-btn{border:none;background:none;cursor:pointer;padding:0 2px;font-size:13px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;z-index:50;max-width:calc(100% - 32px);text-align:center}
 .photo-view{position:fixed;inset:0;background:rgba(0,0,0,.88);display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;z-index:60;padding:20px;color:#fff}
-.photo-view img{max-height:82vh;border-radius:8px}
+.photo-view img{max-height:78vh;max-width:100%;border-radius:8px;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.photo-view .hint{font-size:12px;opacity:.7}
+.pv-menu{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.pv-menu .btn{min-width:130px;background:#ffffff;color:#16211f;border-color:#ffffff}
+.pv-menu .btn.del{background:transparent;color:#ff8a80;border-color:#ff8a80}
+.pv-menu .btn.del.armed{background:#d93025;color:#fff;border-color:#d93025}
+.pv-menu .btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.5)}
 a{color:var(--accent-strong)}
 @media (max-width:420px){.grid3{gap:6px}.stat b{font-size:19px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
@@ -136,7 +142,7 @@ a{color:var(--accent-strong)}
 
 <div id="app" class="wrap"><div class="card"><div class="muted">Loading…</div></div></div>
 <div id="toast" class="toast" hidden></div>
-<div id="pv" class="photo-view" hidden><img id="pvImg" alt=""><div id="pvCap"></div></div>
+<div id="pv" class="photo-view" hidden><img id="pvImg" alt=""><div id="pvCap"></div><div class="hint" id="pvHint"></div><div class="pv-menu" id="pvMenu" hidden></div></div>
 
 <script>
 /* ===================== Config ===================== */
@@ -200,6 +206,7 @@ en:{
   sumHead:['Supervisor','Governorate','Current reading','Total branches','Recorded','Remaining','Completion'],
   readingHdr:'Reading {n}', gapNote:'Short {p} pts ({s} of shelf) vs target {t}',
   photoCap:'{c} · reading {r}', viewPhoto:'View shelf photo',
+  pvSave:'Save photo', pvDelete:'Delete photo', pvConfirm:'Tap again to delete', pvCancel:'Cancel', pvHint:'Press and hold the photo for options', pvDeleted:'Photo deleted', pvSaved:'Photo saved',
   asvIdle:'Changes save automatically', asvSaving:'Saving…', asvSaved:'Saved automatically ✓ {t}', asvLocal:'Saved on this phone. It uploads when the internet is back', asvErr:'Not saved: {e}', draftMark:' ✎ not saved yet', noPhoto:'No photo', photoOf:'Reading {r} · {d}', loadingPhotos:'Loading photos…',
   errs:{ bad_pin:'Wrong PIN', locked:'Too many wrong tries. Sign-in is paused for 15 minutes', locked_reading:'This reading is locked. Only your manager can edit it now',
     forbidden:'You do not have permission for this', actual_gt_total:'Actual shelf cannot be more than the total shelf', invalid:'Some data is missing or not valid',
@@ -260,6 +267,7 @@ ar:{
   sumHead:['المسؤول','المحافظة','القراءة الحالية','إجمالي الفروع','اتسجلت','المتبقي','نسبة الإنجاز'],
   readingHdr:'القراءة {n}', gapNote:'ناقص {p} نقطة ({s} من الرف) عن المستهدف {t}',
   photoCap:'{c} · القراءة {r}', viewPhoto:'عرض صورة الرف',
+  pvSave:'حفظ الصورة', pvDelete:'مسح الصورة', pvConfirm:'اضغط تاني للمسح', pvCancel:'إلغاء', pvHint:'اضغط على الصورة ضغطة طويلة للخيارات', pvDeleted:'اتمسحت الصورة', pvSaved:'اتحفظت الصورة',
   asvIdle:'التعديلات بتتحفظ تلقائيًا', asvSaving:'جاري الحفظ…', asvSaved:'اتحفظ تلقائيًا ✓ {t}', asvLocal:'اتحفظ على الموبايل، وهيترفع لما النت يرجع', asvErr:'لم يتم الحفظ: {e}', draftMark:' ✎ لم يُحفظ بعد', noPhoto:'لا توجد صورة', photoOf:'القراءة {r} · {d}', loadingPhotos:'جاري تحميل الصور…',
   errs:{ bad_pin:'الرمز السري غير صحيح', locked:'تم إيقاف الدخول 15 دقيقة بسبب محاولات خاطئة كثيرة', locked_reading:'القراءة دي اتقفلت. التعديل بقى متاح لمديرك فقط',
     forbidden:'مش مسموح لك بالعملية دي', actual_gt_total:'المساحة الفعلية لا يمكن أن تكون أكبر من الكلية', invalid:'البيانات غير مكتملة أو غير صحيحة',
@@ -376,6 +384,7 @@ class RemoteBackend {
   savePhoto(u,p,branch,cat,data,round){ return this.rpc('save_photo',{p_user:u,p_pin:p,p_branch:branch,p_cat:cat,p_data:data,p_round:round}); }
   getPhotos(u,p,branch){ return this.rpc('get_photos',{p_user:u,p_pin:p,p_branch:branch}); }
   photoIndex(u,p){ return this.rpc('photo_index',{p_user:u,p_pin:p}); }
+  deletePhoto(u,p,branch,cat){ return this.rpc('delete_photo',{p_user:u,p_pin:p,p_branch:branch,p_cat:cat}); }
   async uploadPhoto(dataUrl, path){
     const blob = await (await fetch(dataUrl)).blob();
     let res;
@@ -477,6 +486,11 @@ class LocalBackend {
     if(!b) throw mkErr('no_branch'); if(!this.canBranch(u,b,false)) throw mkErr('forbidden');
     const out = {}; Object.entries(this.db.photos || {}).forEach(([k,v]) => { const [bid,cat] = k.split(':'); if(+bid === branch) out[cat] = v; });
     return clone(out);
+  }
+  async deletePhoto(id,pin,branch,cat){
+    const u = this.auth(id,pin), b = this.db.branches.find(x => x.id === branch);
+    if(!b) throw mkErr('no_branch'); if(!this.canBranch(u,b,true)) throw mkErr('forbidden');
+    if(this.db.photos) delete this.db.photos[branch+':'+cat]; this.persist(); return {ok:true};
   }
   async photoIndex(id,pin){
     const u = this.auth(id,pin), out = {};
@@ -701,7 +715,7 @@ function photoStrip(bid){
   if(!ph) return `<div class="muted">${t('loadingPhotos')}</div>`;
   if(!Object.keys(ph).length) return `<div class="muted">${t('noPhotos')}</div>`;
   return `<div class="strip">${CAT_KEYS.map(k => { const p = ph[k], cap = catName(k);
-    return `<div class="tile"><b>${cap}</b>${p ? `<img src="${esc(p.data)}" alt="${esc(cap)}" data-act="viewphoto" data-src="${esc(p.data)}" data-cap="${esc(cap + ' · ' + t('photoOf',{r:p.round ?? '—', d:fmtDate(p.updated_at)}))}">
+    return `<div class="tile"><b>${cap}</b>${p ? `<img src="${esc(p.data)}" alt="${esc(cap)}" data-act="viewphoto" data-bid="${bid}" data-k="${k}" data-src="${esc(p.data)}" data-cap="${esc(cap + ' · ' + t('photoOf',{r:p.round ?? '—', d:fmtDate(p.updated_at)}))}">
       <small>${t('photoOf',{r:p.round ?? '—', d:fmtDate(p.updated_at)})}</small>` : `<div class="ph">${t('noPhoto')}</div>`}</div>`; }).join('')}</div>`;
 }
 /* ===================== Sign in ===================== */
@@ -915,7 +929,7 @@ function stageHtml(o){
     <div class="row">
       <label class="btn sm" for="stPhoto">${photo ? t('photoChange') : t('photoAdd')}</label>
       <input id="stPhoto" type="file" accept="image/*" capture="environment" hidden data-in="stPhoto">
-      ${photo ? `<img class="thumb" src="${esc(photo)}" alt="${t('viewPhoto')}" data-act="viewphoto" data-src="${esc(photo)}" data-cap="${esc(catName(o.k))}"><button class="btn sm ghost" data-act="rmphoto">${t('photoRemove')}</button>` : ''}
+      ${photo ? `<img class="thumb" src="${esc(photo)}" alt="${t('viewPhoto')}" data-act="viewphoto" data-bid="${S.draft.branch}" data-k="${o.k}" data-src="${esc(photo)}" data-cap="${esc(catName(o.k))}"><button class="btn sm ghost" data-act="rmphoto">${t('photoRemove')}</button>` : ''}
     </div>
     <button class="btn primary" data-act="catsave" id="stSave" ${ok?'':'disabled'}>${t('record')}</button>
   </div>`;
@@ -926,7 +940,7 @@ function photoBtn(c, cap, bid, k, round){
   let src = c.photoData || (c.photo && !String(c.photo).startsWith('db:') ? API.photoUrl(c.photo) : null);
   if(!src && cur && (round == null || cur.round === round)) src = cur.data;
   if(!src) return '';
-  return `<button class="photo-btn" data-act="viewphoto" data-src="${esc(src)}" data-cap="${esc(cap)}" title="${t('viewPhoto')}" aria-label="${t('viewPhoto')}">📷</button>`;
+  return `<button class="photo-btn" data-act="viewphoto" data-bid="${bid}" data-k="${k}" data-src="${esc(src)}" data-cap="${esc(cap)}" title="${t('viewPhoto')}" aria-label="${t('viewPhoto')}">📷</button>`;
 }
 function summaryTable(cats, bid, round){
   let tt = 0, ta = 0;
@@ -1352,7 +1366,84 @@ async function saveFile(name, blob){
 }
 
 /* ===================== Events ===================== */
-function openViewer(src, cap){ const im = document.getElementById('pvImg'); im.src = src; im.alt = cap || ''; document.getElementById('pvCap').textContent = cap || ''; document.getElementById('pv').hidden = false; }
+const PV = {};
+function openViewer(src, cap, bid, k){
+  Object.assign(PV, {src, cap, bid: bid ? +bid : null, k: k || null, armed:false});
+  const im = document.getElementById('pvImg'); im.src = src; im.alt = cap || '';
+  document.getElementById('pvCap').textContent = cap || '';
+  document.getElementById('pvHint').textContent = t('pvHint');
+  document.getElementById('pvMenu').hidden = true;
+  document.getElementById('pv').hidden = false;
+}
+function closeViewer(){ document.getElementById('pv').hidden = true; PV.armed = false; }
+// who may delete: anyone who can edit this branch
+function canDeletePhoto(){
+  if(!PV.bid || !PV.k || !S.user) return false;
+  const b = branchById(PV.bid); if(!b) return false;
+  if(S.user.role === 'admin' || S.user.role === 'analyst') return true;
+  if(S.user.role === 'gov') return b.gov === S.user.gov;
+  return b.sup_id === S.user.id && b.active;
+}
+function showPvMenu(){
+  const m = document.getElementById('pvMenu');
+  m.innerHTML = `<button class="btn" data-pv="save">⬇ ${t('pvSave')}</button>
+    ${canDeletePhoto() ? `<button class="btn del ${PV.armed?'armed':''}" data-pv="del">🗑 ${PV.armed ? t('pvConfirm') : t('pvDelete')}</button>` : ''}
+    <button class="btn ghost" data-pv="cancel">${t('pvCancel')}</button>`;
+  m.hidden = false; document.getElementById('pvHint').textContent = '';
+}
+async function savePhotoFile(){
+  const b = PV.bid ? branchById(PV.bid) : null;
+  const name = `${(b ? b.name : 'shelf').replace(/[\\/:*?"<>|\s]+/g,'_')}_${PV.k ? catName(PV.k) : ''}_${cairoDate(Date.now())}.jpg`;
+  const blob = await (await fetch(PV.src)).blob();
+  const file = new File([blob], name, {type:'image/jpeg'});
+  // on phones the share sheet has "Save image"; elsewhere download the file
+  if(navigator.canShare && navigator.canShare({files:[file]}) && /Android|iPhone|iPad/i.test(navigator.userAgent)){
+    try{ await navigator.share({files:[file]}); return; }catch(e){ if(e && e.name === 'AbortError') return; }
+  }
+  await saveFile(name, blob);
+}
+async function deletePhoto(){
+  const {bid, k} = PV;
+  // a photo that has not been uploaded yet only lives in the draft
+  const d = S.draft;
+  if(d && d.branch === bid){
+    const c = d.cats[k]; if(c){ delete c.photo; delete c.photoData; }
+    if(d.open && d.open.k === k){ delete d.open.photo; delete d.open.photoData; }
+    saveDraft();
+  }
+  const onServer = S.photos[bid] && S.photos[bid][k];
+  if(onServer){
+    await API.deletePhoto(S.sess.id, S.sess.pin, bid, k);
+    delete S.photos[bid][k];
+    if(S.photoIdx[bid]){ delete S.photoIdx[bid][k]; if(!Object.keys(S.photoIdx[bid]).length) delete S.photoIdx[bid]; }
+  }
+  closeViewer(); toast(t('pvDeleted')); render();
+}
+(function(){
+  const pv = document.getElementById('pv'), im = document.getElementById('pvImg');
+  let timer = null, sx = 0, sy = 0;
+  const cancel = () => { clearTimeout(timer); timer = null; };
+  im.addEventListener('pointerdown', e => { sx = e.clientX; sy = e.clientY; cancel(); timer = setTimeout(() => { timer = null; PV.longPressed = true; showPvMenu(); }, 550); });
+  im.addEventListener('pointermove', e => { if(Math.abs(e.clientX - sx) > 10 || Math.abs(e.clientY - sy) > 10) cancel(); });
+  ['pointerup','pointercancel','pointerleave'].forEach(n => im.addEventListener(n, cancel));
+  im.addEventListener('contextmenu', e => { e.preventDefault(); showPvMenu(); });
+  pv.addEventListener('click', async e => {
+    const b = e.target.closest('[data-pv]');
+    if(b){
+      e.stopPropagation();
+      try{
+        if(b.dataset.pv === 'save'){ await savePhotoFile(); }
+        else if(b.dataset.pv === 'del'){ if(!PV.armed){ PV.armed = true; showPvMenu(); return; } await deletePhoto(); }
+        else { document.getElementById('pvMenu').hidden = true; PV.armed = false; document.getElementById('pvHint').textContent = t('pvHint'); }
+      }catch(err){ toast(err.message || I18N[LANG].errs.generic, 4000); }
+      return;
+    }
+    // the click that ends a long press must not close the viewer (the menu may have moved the photo under the finger)
+    if(PV.longPressed){ PV.longPressed = false; return; }
+    if(e.target === im) return;
+    closeViewer();
+  });
+})();
 document.addEventListener('click', async ev => {
   const el = ev.target.closest('[data-act]'); if(!el) return;
   const act = el.dataset.act;
@@ -1389,7 +1480,7 @@ document.addEventListener('click', async ev => {
       S.draft.cats[o.k] = v; S.draft.open = null; saveDraft(); scheduleAutosave(800); return render();
     }
     case 'rmphoto': { const o = S.draft.open; delete o.photo; delete o.photoData; const c = S.draft.cats[o.k]; if(c){ delete c.photo; delete c.photoData; } saveDraft(); scheduleAutosave(); return render(); }
-    case 'viewphoto': return openViewer(el.dataset.src, el.dataset.cap);
+    case 'viewphoto': return openViewer(el.dataset.src, el.dataset.cap, el.dataset.bid, el.dataset.k);
     case 'save': if(!S.busy) await saveBranch(); return;
     case 'share': return share();
     case 'clear':
@@ -1429,10 +1520,9 @@ document.addEventListener('click', async ev => {
   }
   }catch(e){ toast(e.message || I18N[LANG].errs.generic, 4000); }
 });
-document.getElementById('pv').addEventListener('click', () => document.getElementById('pv').hidden = true);
 document.addEventListener('keydown', ev => {
   if(ev.key === 'Enter' && ev.target.id === 'lgPin') doLogin();
-  if(ev.key === 'Escape') document.getElementById('pv').hidden = true;
+  if(ev.key === 'Escape') closeViewer();
 });
 function captureEdit(el){
   const [row, f] = el.dataset.ed.split('|');
