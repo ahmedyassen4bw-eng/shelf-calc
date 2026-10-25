@@ -125,6 +125,28 @@ tr.dirty td{background:var(--warn-soft)}
 .strip b{font-size:12.5px;font-weight:600}
 .strip small{font-size:11px;color:var(--muted)}
 .asv{font-size:12.5px;color:var(--muted)} .asv.ok{color:var(--good)} .asv.err{color:var(--bad)}
+.combo{position:relative}
+.combo-btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--sunken);cursor:pointer;text-align:start;min-height:44px}
+.combo-btn .ph{color:var(--muted)}
+.combo-btn .chev{flex:none;transition:transform .15s;color:var(--muted)}
+.combo.open .combo-btn{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.combo.open .combo-btn .chev{transform:rotate(180deg)}
+.combo-btn .val{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.combo-pop{position:absolute;inset-inline:0;top:calc(100% + 6px);z-index:30;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);overflow:hidden;display:flex;flex-direction:column}
+.combo-search{padding:10px;border-bottom:1px solid var(--line);background:var(--surface)}
+.combo-search input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--sunken);font-size:15px}
+.combo-list{max-height:min(52vh,420px);overflow-y:auto;overscroll-behavior:contain}
+.combo-grp{position:sticky;top:0;background:var(--sunken);color:var(--muted);font-size:12px;font-weight:600;padding:7px 14px;border-bottom:1px solid var(--line);z-index:1}
+.combo-opt{display:flex;align-items:center;gap:10px;width:100%;padding:11px 14px;border:none;border-bottom:1px solid var(--line);background:transparent;text-align:start;cursor:pointer}
+.combo-opt:last-child{border-bottom:none}
+.combo-opt:hover,.combo-opt:focus-visible{background:var(--sunken);outline:none}
+.combo-opt.sel{background:var(--accent-soft)}
+.combo-opt .nm{flex:1;min-width:0}
+.combo-opt .nm small{display:block;font-size:12px;color:var(--muted)}
+.combo-opt mark{background:var(--warn-soft);color:inherit;border-radius:3px;padding:0 1px}
+.chip{flex:none;font-size:11.5px;font-weight:600;border-radius:999px;padding:2px 8px;background:var(--na-soft);color:var(--na);white-space:nowrap}
+.chip.done{background:var(--good-soft);color:var(--good)} .chip.partial,.chip.pend,.chip.draft{background:var(--warn-soft);color:var(--warn)}
+.combo-empty{padding:16px;text-align:center;color:var(--muted);font-size:13.5px}
 .photo-btn{border:none;background:none;cursor:pointer;padding:0 2px;font-size:13px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;z-index:50;max-width:calc(100% - 32px);text-align:center}
 .photo-view{position:fixed;inset:0;background:rgba(0,0,0,.88);display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;z-index:60;padding:20px;color:#fff}
@@ -214,7 +236,9 @@ en:{
   roles:{sup:'Branch Supervisor', gov:'Area Manager', analyst:'Data Analyst', admin:'Manager'},
   cats:{yog:'Yogurt', drk:'Drinks', pud:'Pudding', milk:'Milk'},
   govs:{Cairo:'Cairo', Giza:'Giza', Alex:'Alexandria'},
-  langBtn:'عربي'
+  langBtn:'عربي',
+  searchBranch:'Search by branch name', noMatch:'No branch matches "{q}"', themeAuto:'Auto', themeLight:'Light', themeDark:'Dark', themeTitle:'Display mode', pulled:'Updated',
+  stc_none:'Not recorded', stc_partial:'Missing categories', stc_done:'Complete', stc_pend:'Waiting to upload', stc_draft:'Not saved yet'
 },
 ar:{
   appTitle:'حاسبة نسب المساحات', appSub:'قراءات المساحات على الرفوف حسب الفرع',
@@ -275,7 +299,9 @@ ar:{
   roles:{sup:'مسؤول فروع', gov:'مسؤول عام', analyst:'محلل بيانات', admin:'مدير'},
   cats:{yog:'الزبادى', drk:'المشروبات', pud:'البودينج', milk:'اللبن'},
   govs:{Cairo:'القاهرة', Giza:'الجيزة', Alex:'الإسكندرية'},
-  langBtn:'English'
+  langBtn:'English',
+  searchBranch:'ابحث باسم الفرع', noMatch:'مفيش فرع اسمه "{q}"', themeAuto:'تلقائي', themeLight:'فاتح', themeDark:'غامق', themeTitle:'وضع العرض', pulled:'تم التحديث',
+  stc_none:'لم تسجل', stc_partial:'ناقص فئات', stc_done:'مكتمل', stc_pend:'مستني الرفع', stc_draft:'لم يُحفظ بعد'
 }};
 const CAT_KEYS = ['yog','drk','pud','milk'];
 const GOV_KEYS = ['Cairo','Giza','Alex'];
@@ -296,7 +322,24 @@ const catName = k => I18N[LANG].cats[k];
 const govName = g => g ? I18N[LANG].govs[g] || g : '';
 const roleName = r => I18N[LANG].roles[r] || r;
 const jobTitle = u => (u && u.title) || roleName(u && u.role);
+let THEME = store.get('theme') || 'auto';   // auto | light | dark
+const darkMQ = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+function applyTheme(){
+  const root = document.documentElement;
+  if(THEME === 'auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', THEME);
+  const dark = THEME === 'dark' || (THEME === 'auto' && darkMQ && darkMQ.matches);
+  try{ if(window.ShelfApp && ShelfApp.setDark) ShelfApp.setDark(!!dark); }catch(e){}
+}
+if(darkMQ && darkMQ.addEventListener) darkMQ.addEventListener('change', () => { if(THEME === 'auto') applyTheme(); });
+const THEME_IC = {
+  auto:'<svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true" style="vertical-align:-2px"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 1.8a6.2 6.2 0 0 1 0 12.4z" fill="currentColor"/></svg>',
+  light:'<svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true" style="vertical-align:-2px"><circle cx="8" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+  dark:'<svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true" style="vertical-align:-2px"><path d="M13.5 10.2A6 6 0 0 1 5.8 2.5a6 6 0 1 0 7.7 7.7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>'
+};
+const themeBtn = () => { const ic = THEME_IC[THEME], lb = {auto:t('themeAuto'), light:t('themeLight'), dark:t('themeDark')}[THEME];
+  return `<button class="btn sm ghost" data-act="theme" title="${t('themeTitle')}" aria-label="${t('themeTitle')}: ${lb}">${ic} ${lb}</button>`; };
 function applyLang(){
+  applyTheme();
   document.documentElement.lang = LANG;
   document.documentElement.dir = LANG === 'ar' ? 'rtl' : 'ltr';
   document.title = t('appTitle');
@@ -596,7 +639,16 @@ async function syncQueue(){
   safeRender();
 }
 // re-render unless someone is typing in a category box (a re-render would drop their keyboard)
-function safeRender(){ const a = document.activeElement; if(a && a.closest && a.closest('.stage')) paintAsv(); else render(); }
+function appCanRefresh(on){ try{ if(window.ShelfApp && ShelfApp.setRefreshEnabled) ShelfApp.setRefreshEnabled(!!on); }catch(e){} }
+// pull-to-refresh from the Android app
+window.appRefresh = async function(){
+  try{ if(S.user){ flushAutosave(); await loadData(); await syncQueue(); await syncDrafts(); safeRender(); toast(t('pulled')); } else { await boot(); } }
+  catch(e){ toast(e.message); }
+  finally{ try{ ShelfApp.refreshDone(); }catch(e){} }
+};
+// someone is typing in a category box or browsing the branch list: a re-render would interrupt them
+function uiBusy(){ const a = document.activeElement; return S.comboOpen || !!(a && a.closest && a.closest('.stage')); }
+function safeRender(){ if(uiBusy()) paintAsv(); else render(); }
 
 /* ---------- Draft ---------- */
 function openBranch(bid, round){
@@ -640,8 +692,7 @@ async function autoSave(){
   try{ checkCats(S.draft.cats); }catch(e){ return; }
   if(S.saving){ scheduleAutosave(1500); return; }
   await saveCore(true);
-  const a = document.activeElement;
-  if(a && a.closest && a.closest('.stage')) paintAsv(); else render();
+  if(uiBusy()) paintAsv(); else render();
 }
 function paintAsv(){ const el = document.getElementById('asv'); if(el) el.outerHTML = asvHtml(); }
 function asvHtml(){
@@ -701,8 +752,7 @@ async function loadPhotos(bid, force){
   if(!force && S.photos[bid]) return;
   try{ S.photos[bid] = await API.getPhotos(S.sess.id, S.sess.pin, bid) || {}; }
   catch(e){ S.photos[bid] = S.photos[bid] || {}; return; }
-  const a = document.activeElement;
-  if(S.sel === bid && !(a && a.closest && a.closest('.stage'))) render();
+  if(S.sel === bid && !uiBusy()) render();
 }
 function photoSrc(bid, k, c){
   if(c && c.photoData) return c.photoData;
@@ -778,7 +828,7 @@ function renderLogin(){
   const L = S.login, groups = [...GOV_KEYS, 'mgmt'];
   const inGroup = g => S.users.filter(u => g === 'mgmt' ? !u.gov : u.gov === g);
   app.innerHTML = `
-    <div class="topbar"><div class="brand">${t('appTitle')}<small>${t('appSub')}</small></div><div class="who">${langBtn()}</div></div>
+    <div class="topbar"><div class="brand">${t('appTitle')}<small>${t('appSub')}</small></div><div class="who">${themeBtn()}${langBtn()}</div></div>
     ${DEMO ? `<div class="banner">${t('demo')}</div>` : ''}
     <div class="card">
       <h2>${t('login')}</h2>
@@ -810,8 +860,8 @@ function render(){
       <div class="brand">${t('appTitle')}<small>${esc(S.user.name)} · ${esc(jobTitle(me))}${S.user.gov ? ' · ' + govName(S.user.gov) : ''}</small></div>
       <div class="who">
         ${q ? `<button class="btn sm" data-act="sync">${t('pendingN',{n:q})}</button>` : ''}
+        ${themeBtn()}
         ${langBtn()}
-        <button class="btn sm ghost" data-act="refresh">${t('refresh')}</button>
         <button class="btn sm ghost" data-act="logout">${t('logout')}</button>
       </div>
     </div>
@@ -829,19 +879,68 @@ function statChips(total, done){
     <button class="stat ${f==='left'?'on':''}" data-act="filter" data-v="left"><b>${total-done}</b><span>${t('left')}</span></button>
   </div>`;
 }
+// searchable branch picker that opens under its own box (instead of the phone's floating list)
+const normAr = x => String(x || '').toLowerCase().replace(/[ً-ٟـ]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/\s+/g, ' ').trim();
 function branchSelect(st){
-  const f = S.filter;
-  const left = st.filter(x => x.s !== 'done'), done = st.filter(x => x.s === 'done');
-  const mark = {none:'', partial:' · ' + t('st_partial'), pend:' · ' + t('st_pend'), done:' ✓'};
-  const extra = b => isMgr() && S.f.sup === 'all' ? ' — ' + userName(b.sup_id) : '';
-  const opt = ({b,s}) => `<option value="${b.id}" ${S.sel===b.id?'selected':''}>${esc(b.name)}${esc(extra(b))}${mark[s]}${hasDraft(b.id) ? t('draftMark') : ''}${S.photoIdx[b.id] ? ' 📷' : ''}</option>`;
-  const groups = [];
-  if(f !== 'done') groups.push(`<optgroup label="${t('grpLeft',{n:left.length})}">${left.map(opt).join('')}</optgroup>`);
-  if(f !== 'left') groups.push(`<optgroup label="${t('grpDone',{n:done.length})}">${done.map(opt).join('')}</optgroup>`);
-  const empty = f === 'left' && !left.length;
-  return `<div class="field"><label class="lbl" for="bsel">${t('chooseBranch')}</label>
-    <select id="bsel" data-in="bsel" ${empty?'disabled':''}><option value="">${empty ? t('allDone') : t('chooseBranch') + '…'}</option>${groups.join('')}</select></div>`;
+  S.comboSt = st;
+  return `<div class="field"><span class="lbl" id="bselLbl">${t('chooseBranch')}</span>${comboHtml()}</div>`;
 }
+function comboHtml(){
+  const st = S.comboSt || [], f = S.filter, cur = st.find(x => x.b.id === S.sel);
+  const left = st.filter(x => x.s !== 'done');
+  const empty = f === 'left' && !left.length;
+  const label = cur ? `<span class="val">${esc(cur.b.name)}</span>` : `<span class="val ph">${empty ? t('allDone') : t('chooseBranch') + '…'}</span>`;
+  return `<div class="combo ${S.comboOpen?'open':''}" id="bcombo">
+      <button type="button" class="combo-btn" data-act="combo" aria-haspopup="listbox" aria-expanded="${!!S.comboOpen}" aria-labelledby="bselLbl" ${empty?'disabled':''}>${label}
+        <svg class="chev" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      ${S.comboOpen ? comboPop() : ''}
+    </div>`;
+}
+function comboPop(){
+  const st = S.comboSt || [], f = S.filter, q = normAr(S.comboQ);
+  const match = x => !q || normAr(x.b.name).includes(q);
+  const left = st.filter(x => x.s !== 'done' && match(x)), done = st.filter(x => x.s === 'done' && match(x));
+  const hl = name => { if(!S.comboQ) return esc(name);
+    const i = normAr(name).indexOf(q); if(i < 0 || normAr(name).length !== name.length) return esc(name);
+    return esc(name.slice(0,i)) + '<mark>' + esc(name.slice(i, i+q.length)) + '</mark>' + esc(name.slice(i+q.length)); };
+  const opt = ({b,s}) => { const st2 = hasDraft(b.id) && s !== 'done' ? 'draft' : s;
+    const sub = isMgr() && S.f.sup === 'all' ? `<small>${esc(userName(b.sup_id))}</small>` : '';
+    return `<button type="button" role="option" aria-selected="${S.sel===b.id}" class="combo-opt ${S.sel===b.id?'sel':''}" data-act="pick" data-id="${b.id}">
+      <span class="nm">${hl(b.name)}${sub}</span>${S.photoIdx[b.id] ? '<span aria-hidden="true">📷</span>' : ''}<span class="chip ${st2}">${t('stc_' + st2)}</span></button>`; };
+  let body = '';
+  if(f !== 'done' && left.length) body += `<div class="combo-grp">${t('grpLeft',{n:left.length})}</div>${left.map(opt).join('')}`;
+  if(f !== 'left' && done.length) body += `<div class="combo-grp">${t('grpDone',{n:done.length})}</div>${done.map(opt).join('')}`;
+  if(!body) body = `<div class="combo-empty">${S.comboQ ? t('noMatch',{q:esc(S.comboQ)}) : t('noBranches')}</div>`;
+  return `<div class="combo-pop" id="bpop">
+    <div class="combo-search"><input type="search" id="bsearch" data-in="bsearch" placeholder="${t('searchBranch')}" value="${esc(S.comboQ || '')}" autocomplete="off" enterkeyhint="search"></div>
+    <div class="combo-list" role="listbox" id="blist">${body}</div></div>`;
+}
+function toggleCombo(force){
+  S.comboOpen = force ?? !S.comboOpen;
+  if(!S.comboOpen) S.comboQ = '';
+  appCanRefresh(!S.comboOpen);
+  const box = document.getElementById('bcombo');
+  if(!box){ render(); return; }
+  box.outerHTML = comboHtml();
+  if(S.comboOpen){
+    const sel = document.querySelector('#blist .combo-opt.sel'); if(sel) sel.scrollIntoView({block:'center'});
+    setTimeout(() => { const i = document.getElementById('bsearch'); if(i) i.focus({preventScroll:true}); }, 30);
+    document.getElementById('bcombo').scrollIntoView({block:'start', behavior:'smooth'});
+  }
+}
+function filterCombo(){
+  const list = document.getElementById('blist'); if(!list) return;
+  const tmp = document.createElement('div'); tmp.innerHTML = comboPop();
+  list.innerHTML = tmp.querySelector('#blist').innerHTML;
+}
+function pickBranch(id){
+  S.comboOpen = false; S.comboQ = ''; appCanRefresh(true);
+  if(!id) return render();
+  if(isMgr()){ flushAutosave(); S.sel = id; S.draft = null; S.editRound = null; render(); scrollTo('history'); loadPhotos(id, true); return; }
+  openBranch(id);
+}
+document.addEventListener('pointerdown', e => { if(S.comboOpen && !e.target.closest('#bcombo')) toggleCombo(false); }, true);
+document.addEventListener('keydown', e => { if(S.comboOpen && e.key === 'Escape') toggleCombo(false); });
 
 /* ---------- Branch supervisor ---------- */
 function renderSup(){
@@ -1379,9 +1478,9 @@ function openViewer(src, cap, bid, k){
   document.getElementById('pvCap').textContent = cap || '';
   document.getElementById('pvHint').textContent = t('pvHint');
   document.getElementById('pvMenu').hidden = true;
-  document.getElementById('pv').hidden = false;
+  document.getElementById('pv').hidden = false; appCanRefresh(false);
 }
-function closeViewer(){ document.getElementById('pv').hidden = true; PV.armed = false; }
+function closeViewer(){ document.getElementById('pv').hidden = true; PV.armed = false; appCanRefresh(true); }
 // who may delete: anyone who can edit this branch
 function canDeletePhoto(){
   if(!PV.bid || !PV.k || !S.user) return false;
@@ -1460,6 +1559,9 @@ document.addEventListener('click', async ev => {
     case 'lang': LANG = LANG === 'en' ? 'ar' : 'en'; store.set('lang', LANG); return S.user ? render() : renderLogin();
     case 'login': return doLogin();
     case 'logout': return logout();
+    case 'theme': THEME = {auto:'light', light:'dark', dark:'auto'}[THEME]; store.set('theme', THEME); applyTheme(); return S.user ? render() : renderLogin();
+    case 'combo': return toggleCombo();
+    case 'pick': return pickBranch(+el.dataset.id);
     case 'refresh': try{ await loadData(); await syncQueue(); toast(t('refreshed')); }catch(e){ toast(e.message); } return;
     case 'sync': return syncQueue();
     case 'filter': S.filter = el.dataset.v; return render();
@@ -1538,6 +1640,7 @@ document.addEventListener('input', ev => {
   if(ev.target.dataset && ev.target.dataset.ed){ captureEdit(ev.target); return; }
   const el = ev.target, k = el.dataset && el.dataset.in; if(!k) return;
   if(k === 'lgPin'){ S.login.pin = el.value; return; }
+  if(k === 'bsearch'){ S.comboQ = el.value; filterCombo(); return; }
   if(k === 'aq'){ S.aq = el.value; const pos = el.selectionStart; render(); const n = document.getElementById('aq'); n.focus(); n.setSelectionRange(pos,pos); return; }
   if(k === 'stT' || k === 'stA'){ readStage(); commitOpen(); saveDraft(); updateStageLive(); scheduleAutosave(); return; }
 });
