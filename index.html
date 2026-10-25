@@ -1356,6 +1356,12 @@ async function exportExcel(){
   await saveFile(`${t('appTitle')}_${scope}_${cairoDate(Date.now())}.xlsx`.replace(/\s+/g,'_'), new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
 }
 async function saveFile(name, blob){
+  // inside the Android app: hand the file to the app, which saves it to the phone
+  if(window.ShelfApp && window.ShelfApp.saveFile){
+    const b64 = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1] || ''); r.onerror = rej; r.readAsDataURL(blob); });
+    if(!window.ShelfApp.saveFile(name, blob.type || 'application/octet-stream', b64)) toast(I18N[LANG].errs.generic);
+    return;
+  }
   try{
     const dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null;
     if(dl){ await dl.save({filename:name, data:blob}); return; }
